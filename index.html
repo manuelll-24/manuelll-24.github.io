@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>⚽ WM 2026 Tippspiel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f6f2;--surface:#fff;--surface2:#f0eeea;
+  --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
+  --text:#1a1a18;--muted:#6b6a66;--hint:#9c9b97;
+  --green:#2d7a3a;--green-bg:#e8f5eb;
+  --amber:#8a5a00;--amber-bg:#fff3d6;
+  --blue:#1a5fa8;--blue-bg:#e4effe;
+  --red:#b52a2a;--red-bg:#fdeaea;
+  --r-md:10px;--r-lg:14px;--r-xl:18px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111110;--surface:#1c1c1a;--surface2:#252523;
+  --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);
+  --text:#f0efe9;--muted:#9c9b97;--hint:#6b6a66;
+  --green:#5ec96a;--green-bg:#1a3320;
+  --amber:#f0b940;--amber-bg:#2e2200;
+  --blue:#6aadff;--blue-bg:#0d1e35;
+  --red:#f07070;--red-bg:#2e1111;
+}}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-text-size-adjust:100%}
+input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
+.app{max-width:480px;margin:0 auto;padding:0 0 80px}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.header-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 10px 5px 6px;font-size:13px;font-weight:500;white-space:nowrap}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--blue-bg);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom);width:100%;max-width:480px}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;font-size:10px;color:var(--hint);border:none;background:none;transition:color .15s}
+.nav-item.active{color:var(--blue)}
+.nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.section{display:none;padding:16px}.section.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:16px;transition:border-color .2s;outline:none}
+.input:focus{border-color:var(--blue)}
+.btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
+.btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none}
+.gtabs::-webkit-scrollbar{display:none}
+.gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500}
+.gtab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.match-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.match-item:last-child{border-bottom:none}
+.match-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.match-date{font-size:11px;color:var(--hint)}
+.match-teams{display:grid;grid-template-columns:1fr 90px 1fr;align-items:center;gap:6px}
+.team-name{font-size:14px;font-weight:600}
+.team-home{text-align:right}.team-away{text-align:left}
+.score-box{display:flex;align-items:center;justify-content:center;gap:5px}
+.score-in{width:36px;height:36px;text-align:center;font-size:17px;font-weight:700;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);padding:0;-moz-appearance:textfield}
+.score-in::-webkit-outer-spin-button,.score-in::-webkit-inner-spin-button{-webkit-appearance:none}
+.score-in:focus{outline:none;border-color:var(--blue)}
+.score-sep{font-size:15px;font-weight:700;color:var(--muted)}
+.live-result{background:var(--text);color:var(--bg);border-radius:8px;padding:4px 10px;font-size:17px;font-weight:800;text-align:center;min-width:52px}
+.chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
+.chip-3{background:var(--green-bg);color:var(--green)}
+.chip-1{background:var(--amber-bg);color:var(--amber)}
+.chip-0{background:var(--surface2);color:var(--hint)}
+.chip-live{background:var(--red-bg);color:var(--red)}
+.chip-done{background:var(--surface2);color:var(--muted)}
+.save-btn{width:100%;padding:14px;border-radius:var(--r-lg);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:all .15s;margin-top:12px}
+.save-btn:active{transform:scale(.98);opacity:.88}
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rank-row:last-child{border-bottom:none}
+.rank-pos{width:28px;font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
+.rank-name{flex:1;font-size:15px;font-weight:600}
+.rank-name small{font-size:11px;color:var(--hint);font-weight:400;margin-left:4px}
+.rank-pts-val{font-size:17px;font-weight:800;text-align:right}
+.rank-pts-sub{font-size:11px;color:var(--muted);text-align:right}
+.rank-row.me{background:var(--blue-bg);border-radius:var(--r-md);padding:10px;margin:0 -4px}
+.bonus-item{margin-bottom:14px}
+.bonus-label{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.bonus-pts{font-size:11px;background:var(--blue-bg);color:var(--blue);padding:2px 7px;border-radius:10px;font-weight:600}
+.rule-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.rule-row:last-child{border-bottom:none}
+.rule-pts{font-size:20px;font-weight:800;color:var(--blue)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-box{background:var(--surface2);border-radius:var(--r-md);padding:10px;text-align:center}
+.stat-val{font-size:22px;font-weight:800}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;display:inline-block;margin-right:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.loader{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+.spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--text);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.config-wrap{padding:20px 16px;max-width:480px;margin:0 auto}
+.config-note{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--amber);margin-bottom:16px;line-height:1.55}
+.code-block{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 14px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;overflow-x:auto;margin:6px 0 12px;white-space:pre;line-height:1.65;color:var(--text)}
+.step{display:flex;gap:12px;margin-bottom:18px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--bg);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.step-content p{font-size:13px;color:var(--muted);line-height:1.55}
+</style>
+</head>
+<body>
+
+<!-- ══ CONFIG ══════════════════════════════════════════════════ -->
+<div id="cfg-screen" style="display:none">
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:50">
+    <h1 style="font-size:17px;font-weight:700">⚽ WM 2026 Tippspiel – Einrichtung</h1>
+  </div>
+  <div class="config-wrap">
+    <div class="config-note">⚙️ Einmalige Einrichtung – danach einfach den Link an alle Freunde schicken!</div>
+
+    <div class="step"><div class="step-num">1</div><div class="step-content">
+      <h3>Supabase Projekt anlegen</h3>
+      <p>Auf <strong>supabase.com</strong> kostenlos registrieren → Neues Projekt → Name: wm2026, Region: <strong>EU (Frankfurt)</strong> oder <strong>EU (Stockholm)</strong>.</p>
+    </div></div>
+
+    <div class="step"><div class="step-num">2</div><div class="step-content">
+      <h3>SQL ausführen</h3>
+      <p>Im <strong>SQL Editor</strong> die Datei <code>setup.sql</code> einfügen und ausführen. Tabellen, RLS-Policies, pg_cron-Job und Ranglisten-View werden erstellt.</p>
+    </div></div>
+
+    <div class="step"><div class="step-num">3</div><div class="step-content">
+      <h3>Zafronix API-Key holen</h3>
+      <p>Auf <strong>api.zafronix.com/signup</strong> kostenlosen Key holen (250 Req/Tag, reicht locker). Key unter Supabase → <strong>Edge Functions → Secrets</strong> als <code>ZAFRONIX_API_KEY</code> speichern.</p>
+    </div></div>
+
+    <div class="step"><div class="step-num">4</div><div class="step-content">
+      <h3>Edge Function deployen</h3>
+      <p>Die Datei <code>supabase/functions/fetch-scores/index.ts</code> mit der Supabase CLI deployen:</p>
+      <div class="code-block">supabase functions deploy fetch-scores --project-ref DEIN_REF</div>
+      <p>Danach in <code>setup.sql</code> die Zeile mit <code>net.http_post</code> anpassen (Projekt-Ref + Service-Role-Key eintragen) und ausführen.</p>
+    </div></div>
+
+    <div class="step"><div class="step-num">5</div><div class="step-content">
+      <h3>Keys hier eintragen</h3>
+    </div></div>
+
+    <div class="card">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:5px">Supabase Project URL</label>
+          <input class="input" id="cfg-url" placeholder="https://xxxxx.supabase.co" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:5px">Supabase Anon Key</label>
+          <input class="input" id="cfg-key" placeholder="eyJhbGciOiJ..." />
+        </div>
+        <button class="btn btn-primary" onclick="saveCfg()">Speichern & Starten →</button>
+      </div>
+    </div>
+
+    <div class="step"><div class="step-num">6</div><div class="step-content">
+      <h3>Hosten & Link teilen</h3>
+      <p>Diese <code>index.html</code> auf <strong>netlify.com/drop</strong> hochladen – fertig! Den Link an alle Freunde schicken.</p>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ════════════════════════════════════════════════════ -->
+<div id="login-screen" style="display:none">
+  <div class="login-wrap">
+    <div style="font-size:52px">⚽</div>
+    <div style="font-size:26px;font-weight:800;letter-spacing:-.5px">WM 2026</div>
+    <div style="font-size:15px;color:var(--muted);text-align:center;max-width:260px">Tippe alle Spiele und fordere deine Freunde heraus</div>
+    <div class="login-card">
+      <div style="font-size:15px;font-weight:700">Dein Nickname</div>
+      <input class="input" id="nick-input" type="text" placeholder="z.B. Schlaubi" maxlength="20" />
+      <button class="btn btn-primary" onclick="doLogin()">Loslegen →</button>
+    </div>
+    <div style="font-size:12px;color:var(--hint);text-align:center">Selben Nickname eingeben um Tipps zu laden</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<div id="main-app" style="display:none">
+  <div class="app">
+    <div class="header">
+      <div>
+        <h1>⚽ WM 2026 Tippspiel</h1>
+        <div class="header-sub" id="hdr-sub">Gruppenphase</div>
+      </div>
+      <div class="user-pill"><div class="avatar" id="hdr-av">?</div><span id="hdr-nick">—</span></div>
+    </div>
+
+    <!-- TIPPS -->
+    <div class="section active" id="sec-tipps">
+      <div id="live-banner" style="display:none;margin-bottom:10px;font-size:12px;color:var(--muted)">
+        <span class="live-dot"></span>Live-Daten aus Supabase · <span id="last-sync">—</span>
+      </div>
+      <div class="gtabs" id="gtabs"></div>
+      <div class="card" style="padding:0 16px">
+        <div id="group-matches"><div class="loader"><div class="spinner"></div>Lade Spiele…</div></div>
+      </div>
+      <button class="save-btn" onclick="saveTipps()">Tipps speichern</button>
+    </div>
+
+    <!-- BONUS -->
+    <div class="section" id="sec-bonus">
+      <div class="card">
+        <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
+        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" placeholder="z.B. Brasilien" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
+        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Torhüter <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" placeholder="z.B. Alisson" /></div>
+      </div>
+      <button class="save-btn" onclick="saveBonus()">Bonus speichern</button>
+    </div>
+
+    <!-- RANGLISTE -->
+    <div class="section" id="sec-rangliste">
+      <div class="card" id="my-stats" style="display:none">
+        <div class="card-title">Meine Statistik</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-val" id="st-pts">0</div><div class="stat-lbl">Punkte</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-exact">0</div><div class="stat-lbl">Exakt</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-tend">0</div><div class="stat-lbl">Tendenz</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">Turnierfortschritt</div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Rangliste</div>
+        <div id="ranking-list"><div class="loader"><div class="spinner"></div>Lade…</div></div>
+      </div>
+    </div>
+
+    <!-- ERGEBNISSE -->
+    <div class="section" id="sec-ergebnisse">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">Ergebnisse</div>
+          <button class="btn-sm" onclick="loadMatches().then(renderCurrentGroup)">↻</button>
+        </div>
+        <div id="results-list"><div class="loader"><div class="spinner"></div>Lade…</div></div>
+      </div>
+    </div>
+
+    <!-- REGELN -->
+    <div class="section" id="sec-regeln">
+      <div class="card">
+        <div class="card-title">Punktesystem</div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore korrekt</div></div><div class="rule-pts">3</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden korrekt</div></div><div class="rule-pts">1</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Weltmeister</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Finalist</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Torschützenkönig</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Bester Torhüter</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Automatische Ergebnisse</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.75">
+          • Ergebnisse werden von der Zafronix API abgerufen.<br>
+          • Abruf läuft automatisch auf dem Server (Stockholm).<br>
+          • Aktive Spiele: alle <strong>5 Minuten</strong> aktualisiert.<br>
+          • Keine laufenden Spiele: alle <strong>15 Minuten</strong>.<br>
+          • Zeitfenster: <strong>18:30 – 07:00 Berliner Zeit</strong>.<br>
+          • Tipps bis zum Anpfiff möglich, danach gesperrt.
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:4px"><button class="btn-sm" onclick="logout()">Abmelden</button></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchSec('tipps',this)">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Tipps
+      </button>
+      <button class="nav-item" onclick="switchSec('bonus',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Bonus
+      </button>
+      <button class="nav-item" onclick="switchSec('rangliste',this)">
+        <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Rangliste
+      </button>
+      <button class="nav-item" onclick="switchSec('ergebnisse',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ergebnisse
+      </button>
+      <button class="nav-item" onclick="switchSec('regeln',this)">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Regeln
+      </button>
+    </nav>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+let SB_URL = localStorage.getItem('sb_url')||'';
+let SB_KEY = localStorage.getItem('sb_key')||'';
+
+// ── STATE ─────────────────────────────────────────────────────
+let sb=null, player=null;
+let myTipps={};      // match_id -> {h,a}
+let dbMatches=[];    // rows from matches table
+let activeGroup='A';
+let refreshTimer=null;
+
+// Gruppen-Mapping: Zafronix group_name -> Buchstabe
+// Zafronix liefert z.B. "group_a" oder "Group A"
+const GROUP_KEYS=['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+// Kickoff-Zeiten (Berliner Zeit) für Tipp-Sperre
+// Falls noch kein kickoff_utc aus DB → Tipp immer erlaubt
+function isTippLocked(match) {
+  if(!match.kickoff_utc) return false;
+  return new Date() >= new Date(match.kickoff_utc);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async()=>{
+  if(!SB_URL||!SB_KEY){ show('cfg-screen'); return; }
+  sb = supabase.createClient(SB_URL, SB_KEY);
+  const saved = localStorage.getItem('wm2026_player');
+  if(saved){ player=JSON.parse(saved); await startApp(); }
+  else show('login-screen');
+});
+
+function show(id){
+  ['cfg-screen','login-screen','main-app'].forEach(i=>
+    document.getElementById(i).style.display=i===id?'block':'none');
+}
+
+// ── CONFIG ────────────────────────────────────────────────────
+function saveCfg(){
+  const u=document.getElementById('cfg-url').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(!u||!k){toast('Bitte beide Felder ausfüllen');return;}
+  localStorage.setItem('sb_url',u);
+  localStorage.setItem('sb_key',k);
+  location.reload();
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+async function doLogin(){
+  const nick=document.getElementById('nick-input').value.trim();
+  if(!nick||nick.length<2){toast('Mindestens 2 Zeichen');return;}
+  try{
+    let {data:p}=await sb.from('players').select('*').eq('nick',nick).single();
+    if(!p){
+      const {data:np,error}=await sb.from('players').insert({nick}).select().single();
+      if(error)throw error;
+      p=np;
+    }
+    player=p;
+    localStorage.setItem('wm2026_player',JSON.stringify(p));
+    await startApp();
+  }catch(e){toast('Fehler: '+(e.message||'Verbindungsproblem'));}
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
+});
+function logout(){
+  clearInterval(refreshTimer);
+  localStorage.removeItem('wm2026_player');
+  player=null; show('login-screen');
+}
+
+// ── START APP ─────────────────────────────────────────────────
+async function startApp(){
+  show('main-app');
+  document.getElementById('hdr-nick').textContent=player.nick;
+  document.getElementById('hdr-av').textContent=player.nick.charAt(0).toUpperCase();
+  await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+  buildGroupTabs();
+  renderCurrentGroup();
+  // Supabase alle 30s pollen (kein direkter API-Kontakt!)
+  refreshTimer=setInterval(async()=>{
+    await loadMatches();
+    renderCurrentGroup();
+    document.getElementById('last-sync').textContent=
+      new Date().toLocaleTimeString('de',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('live-banner').style.display='flex';
+  },30000);
+}
+
+// ── SUPABASE DATA ─────────────────────────────────────────────
+async function loadMatches(){
+  const {data,error}=await sb.from('matches').select('*').order('match_id');
+  if(!error&&data) dbMatches=data;
+}
+async function loadMyTipps(){
+  const {data}=await sb.from('tipps').select('*').eq('player_id',player.id);
+  myTipps={};
+  (data||[]).forEach(t=>{myTipps[t.match_id]={h:t.home_score,a:t.away_score};});
+}
+async function loadBonus(){
+  const {data}=await sb.from('bonus_tipps').select('*').eq('player_id',player.id).single();
+  if(data){
+    document.getElementById('b-wm').value=data.weltmeister||'';
+    document.getElementById('b-finalist').value=data.finalist||'';
+    document.getElementById('b-tore').value=data.torschuetze||'';
+    document.getElementById('b-keeper').value=data.torhueter||'';
+  }
+}
+
+// ── GRUPPEN ────────────────────────────────────────────────────
+function getGroupChar(m){
+  // group_name kann sein: "group_a","Group A","A" etc.
+  if(!m.group_name) return null;
+  const s=m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim();
+  return s.charAt(0);
+}
+function buildGroupTabs(){
+  const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
+  if(!groups.length) return;
+  activeGroup=groups[0];
+  const tabs=document.getElementById('gtabs');
+  tabs.innerHTML=groups.map(g=>
+    `<button class="gtab ${g===activeGroup?'active':''}" onclick="switchGroup('${g}')">${g}</button>`
+  ).join('');
+}
+function switchGroup(g){
+  activeGroup=g;
+  document.querySelectorAll('.gtab').forEach(b=>{
+    b.classList.toggle('active',b.textContent===g);
+  });
+  renderCurrentGroup();
+}
+
+function renderCurrentGroup(){
+  const matches=dbMatches.filter(m=>getGroupChar(m)===activeGroup);
+  if(!matches.length){
+    document.getElementById('group-matches').innerHTML=
+      '<div class="loader" style="padding:20px 0">Keine Spiele in dieser Gruppe</div>';
+    return;
+  }
+  document.getElementById('group-matches').innerHTML=
+    matches.map(m=>renderMatchRow(m)).join('');
+
+  // Ergebnis-Ansicht mitaktualisieren wenn sichtbar
+  if(document.getElementById('sec-ergebnisse').classList.contains('active'))
+    renderResults();
+}
+
+function renderMatchRow(m){
+  const locked=isTippLocked(m);
+  const tip=myTipps[m.match_id]||{h:'',a:''};
+  const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
+  const isDone=m.status==='FT';
+  const hasScore=m.home_score!==null&&m.away_score!==null;
+  const pts=isDone&&hasScore?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
+
+  // Datum aus kickoff_utc in Berliner Zeit
+  let dateStr='';
+  if(m.kickoff_utc){
+    const d=new Date(m.kickoff_utc);
+    dateStr=d.toLocaleDateString('de',{timeZone:'Europe/Berlin',day:'numeric',month:'short'})
+      +' · '+d.toLocaleTimeString('de',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'});
+  }
+
+  const statusChip=isLive
+    ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
+    : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
+  const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
+    :pts===1?`<span class="chip chip-1">+1</span>`
+    :pts===0&&isDone?`<span class="chip chip-0">+0</span>`:'';
+
+  const scoreHtml=(isLive||isDone)&&hasScore
+    ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
+    :`<div class="score-box">
+       <input class="score-in" type="number" min="0" max="20"
+              value="${tip.h!==''&&tip.h!=null?tip.h:''}"
+              id="t_${m.match_id}_h" placeholder="–"${locked?' disabled':''}>
+       <span class="score-sep">:</span>
+       <input class="score-in" type="number" min="0" max="20"
+              value="${tip.a!==''&&tip.a!=null?tip.a:''}"
+              id="t_${m.match_id}_a" placeholder="–"${locked?' disabled':''}>
+     </div>`;
+
+  return `<div class="match-item">
+    <div class="match-top">
+      <span class="match-date">${dateStr}</span>
+      <div style="display:flex;gap:5px;align-items:center">${statusChip}${ptsChip}</div>
+    </div>
+    <div class="match-teams">
+      <div class="team-name team-home">${m.home_team}</div>
+      ${scoreHtml}
+      <div class="team-name team-away">${m.away_team}</div>
+    </div>
+    ${(isLive||isDone)&&tip.h!==''&&tip.h!=null
+      ?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:4px">Dein Tipp: ${tip.h}:${tip.a}</div>`:''}
+  </div>`;
+}
+
+// ── SAVE ──────────────────────────────────────────────────────
+async function saveTipps(){
+  const matches=dbMatches.filter(m=>getGroupChar(m)===activeGroup&&!isTippLocked(m));
+  const upserts=[];
+  matches.forEach(m=>{
+    const hEl=document.getElementById(`t_${m.match_id}_h`);
+    const aEl=document.getElementById(`t_${m.match_id}_a`);
+    if(!hEl||!aEl)return;
+    const h=hEl.value!==''?parseInt(hEl.value):null;
+    const a=aEl.value!==''?parseInt(aEl.value):null;
+    if(h!==null&&a!==null){
+      upserts.push({player_id:player.id,match_id:m.match_id,home_score:h,away_score:a,updated_at:new Date().toISOString()});
+      myTipps[m.match_id]={h,a};
+    }
+  });
+  if(!upserts.length){toast('Keine neuen Tipps eingegeben');return;}
+  const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
+  if(error){toast('Fehler: '+error.message);return;}
+  renderCurrentGroup();
+  toast(`✓ ${upserts.length} Tipps gespeichert!`);
+}
+async function saveBonus(){
+  const d={
+    player_id:player.id,
+    weltmeister:document.getElementById('b-wm').value,
+    finalist:document.getElementById('b-finalist').value,
+    torschuetze:document.getElementById('b-tore').value,
+    torhueter:document.getElementById('b-keeper').value,
+    updated_at:new Date().toISOString()
+  };
+  const {error}=await sb.from('bonus_tipps').upsert(d,{onConflict:'player_id'});
+  if(error)toast('Fehler: '+error.message);
+  else toast('✓ Bonus-Tipps gespeichert!');
+}
+
+// ── RANKING ───────────────────────────────────────────────────
+async function loadRanking(){
+  // Ranglisten-View direkt abfragen
+  const {data:ranks}=await sb.from('rangliste').select('*');
+  const finished=dbMatches.filter(m=>m.status==='FT').length;
+  const me=ranks?.find(r=>r.nick===player.nick);
+  if(me){
+    document.getElementById('st-pts').textContent=me.punkte||0;
+    document.getElementById('st-exact').textContent=me.exakt||0;
+    document.getElementById('st-tend').textContent=me.tendenz||0;
+    document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
+    document.getElementById('my-stats').style.display='block';
+  }
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('ranking-list').innerHTML=(ranks||[]).map((p,i)=>{
+    const isMe=p.nick===player.nick;
+    const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
+    return `<div class="rank-row ${isMe?'me':''}">
+      ${pos}
+      <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
+      <div>
+        <div class="rank-pts-val">${p.punkte||0}</div>
+        <div class="rank-pts-sub">${p.exakt||0}✓ ${p.tendenz||0}~</div>
+      </div>
+    </div>`;
+  }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele beendet</div>';
+}
+
+// ── RESULTS ───────────────────────────────────────────────────
+function renderResults(){
+  const shown=dbMatches.filter(m=>
+    ['1H','HT','2H','ET','PEN','FT'].includes(m.status)&&
+    m.home_score!==null&&m.away_score!==null
+  );
+  if(!shown.length){
+    document.getElementById('results-list').innerHTML=
+      '<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele gestartet</div>';
+    return;
+  }
+  document.getElementById('results-list').innerHTML=shown.map(m=>{
+    const tip=myTipps[m.match_id];
+    const isDone=m.status==='FT';
+    const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
+    const pts=isDone&&tip?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
+    const ptsHtml=pts===3?`<span class="chip chip-3">+3</span>`
+      :pts===1?`<span class="chip chip-1">+1</span>`
+      :pts===0?`<span class="chip chip-0">+0</span>`
+      :`<span style="font-size:11px;color:var(--hint)">—</span>`;
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr 32px;align-items:center;gap:8px">
+        <div style="font-size:13px;font-weight:600;text-align:right">${m.home_team}</div>
+        <div>
+          <div style="background:var(--text);color:var(--bg);border-radius:8px;padding:3px 0;font-size:16px;font-weight:800;text-align:center">${m.home_score}:${m.away_score}</div>
+          ${isLive?`<div style="font-size:10px;color:var(--red);font-weight:600;text-align:center;margin-top:2px">🔴 LIVE</div>`:''}
+        </div>
+        <div style="font-size:13px;font-weight:600">${m.away_team}</div>
+        ${ptsHtml}
+      </div>
+      ${tip?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:3px">Tipp: ${tip.h}:${tip.a}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function calcPts(tip,res){
+  if(tip.h===null||tip.h===undefined||tip.h==='')return null;
+  const th=parseInt(tip.h),ta=parseInt(tip.a);
+  if(th===res.h&&ta===res.a)return 3;
+  if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a))return 1;
+  return 0;
+}
+function switchSec(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='rangliste')loadRanking();
+  if(name==='ergebnisse')renderResults();
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
