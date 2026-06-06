@@ -141,14 +141,45 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <h1>⚽ WM 2026 Tippspiel</h1>
         <div class="header-sub" id="hdr-sub">Gruppenphase</div>
       </div>
-      <div class="user-pill"><div class="avatar" id="hdr-av">?</div><span id="hdr-nick">—</span></div>
+      <div class="user-pill" onclick="toggleUserMenu()" style="cursor:pointer;position:relative">
+        <div class="avatar" id="hdr-av">?</div>
+        <span id="hdr-nick">—</span>
+        <span style="font-size:10px;color:var(--hint);margin-left:2px">▾</span>
+      </div>
+    </div>
+
+    <!-- USER MENU DROPDOWN -->
+    <div id="user-menu" style="display:none;position:fixed;top:56px;right:12px;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:700" id="menu-nick">—</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Angemeldet</div>
+      </div>
+      <button onclick="switchSec('regeln',null);toggleUserMenu()" style="width:100%;text-align:left;padding:11px 16px;font-size:14px;border:none;background:none;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)">
+        📋 Regeln & Punktesystem
+      </button>
+      <button onclick="logout()" style="width:100%;text-align:left;padding:11px 16px;font-size:14px;border:none;background:none;color:var(--red);cursor:pointer;font-weight:500">
+        → Abmelden
+      </button>
+    </div>
+    <div id="user-menu-backdrop" onclick="toggleUserMenu()" style="display:none;position:fixed;inset:0;z-index:99"></div>
+
+    <!-- HOME -->
+    <div class="section active" id="sec-home">
+      <!-- Live / nächste Spiele -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Aktuell & Heute</div>
+        <button class="btn-sm" onclick="refreshHome()">↻</button>
+      </div>
+      <div id="home-matches"><div class="loader"><div class="spinner"></div>Lade…</div></div>
+
+      <!-- Nächste 24h tippbar -->
+      <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 10px">Nächste 24h – jetzt tippen</div>
+      <div id="home-upcoming"></div>
+      <div id="home-upcoming-empty" style="display:none;font-size:13px;color:var(--hint);padding:8px 0">Keine Spiele in den nächsten 24h</div>
     </div>
 
     <!-- TIPPS -->
-    <div class="section active" id="sec-tipps">
-      <div id="live-banner" style="display:none;margin-bottom:10px;font-size:12px;color:var(--muted)">
-        <span class="live-dot"></span>Live-Daten aus Supabase · <span id="last-sync">—</span>
-      </div>
+    <div class="section" id="sec-tipps">
       <div class="gtabs" id="gtabs"></div>
       <div class="card" style="padding:0 16px">
         <div id="group-matches"><div class="loader"><div class="spinner"></div>Lade Spiele…</div></div>
@@ -185,17 +216,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
-    <!-- ERGEBNISSE -->
-    <div class="section" id="sec-ergebnisse">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div class="card-title" style="margin-bottom:0">Ergebnisse</div>
-          <button class="btn-sm" onclick="loadMatches().then(renderCurrentGroup)">↻</button>
-        </div>
-        <div id="results-list"><div class="loader"><div class="spinner"></div>Lade…</div></div>
-      </div>
-    </div>
-
     <!-- REGELN -->
     <div class="section" id="sec-regeln">
       <div class="card">
@@ -217,23 +237,22 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
           • Tipps bis zum Anpfiff möglich, danach gesperrt.
         </div>
       </div>
-      <div style="text-align:center;margin-top:4px"><button class="btn-sm" onclick="logout()">Abmelden</button></div>
     </div>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" onclick="switchSec('tipps',this)">
+      <button class="nav-item active" id="nav-home" onclick="switchSec('home',this)">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+      </button>
+      <button class="nav-item" id="nav-tipps" onclick="switchSec('tipps',this)">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Tipps
       </button>
-      <button class="nav-item" onclick="switchSec('bonus',this)">
+      <button class="nav-item" id="nav-bonus" onclick="switchSec('bonus',this)">
         <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Bonus
       </button>
-      <button class="nav-item" onclick="switchSec('rangliste',this)">
+      <button class="nav-item" id="nav-rangliste" onclick="switchSec('rangliste',this)">
         <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Rangliste
       </button>
-      <button class="nav-item" onclick="switchSec('ergebnisse',this)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Ergebnisse
-      </button>
-      <button class="nav-item" onclick="switchSec('regeln',this)">
+      <button class="nav-item" id="nav-regeln" onclick="switchSec('regeln',this)">
         <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Regeln
       </button>
     </nav>
@@ -318,6 +337,7 @@ async function startApp(){
   show('main-app');
   document.getElementById('hdr-nick').textContent=player.nick;
   document.getElementById('hdr-av').textContent=player.nick.charAt(0).toUpperCase();
+  document.getElementById('menu-nick').textContent=player.nick;
   await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
   buildGroupTabs();
   renderCurrentGroup();
@@ -325,9 +345,7 @@ async function startApp(){
   refreshTimer=setInterval(async()=>{
     await loadMatches();
     renderCurrentGroup();
-    document.getElementById('last-sync').textContent=
-      new Date().toLocaleTimeString('de',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('live-banner').style.display='flex';
+    if(document.getElementById('sec-home').classList.contains('active')) renderHome();
   },30000);
 }
 
@@ -425,7 +443,7 @@ function renderCurrentGroup(){
     return;
   }
   document.getElementById('group-matches').innerHTML=matches.map(m=>renderMatchRow(m)).join('');
-  if(document.getElementById('sec-ergebnisse').classList.contains('active')) renderResults();
+  if(document.getElementById('sec-home').classList.contains('active')) renderHome();
 }
 
 function renderMatchRow(m){
@@ -602,9 +620,102 @@ function switchSec(name,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
-  btn.classList.add('active');
-  if(name==='rangliste')loadRanking();
-  if(name==='ergebnisse')renderResults();
+  // nav button: btn kann null sein (bei Aufruf aus Menü)
+  if(btn) btn.classList.add('active');
+  else {
+    const nb=document.getElementById('nav-'+name);
+    if(nb) nb.classList.add('active');
+  }
+  if(name==='rangliste') loadRanking();
+  if(name==='home') renderHome();
+}
+
+// ── USER MENU ──────────────────────────────────────────────────
+function toggleUserMenu(){
+  const m=document.getElementById('user-menu');
+  const b=document.getElementById('user-menu-backdrop');
+  const open=m.style.display==='block';
+  m.style.display=open?'none':'block';
+  b.style.display=open?'none':'block';
+}
+
+// ── HOME SCREEN ────────────────────────────────────────────────
+function renderHome(){
+  const now=new Date();
+  const in24=new Date(now.getTime()+24*60*60*1000);
+
+  // Laufende + heute gespielte Spiele
+  const active=dbMatches.filter(m=>{
+    if(['1H','HT','2H','ET','PEN'].includes(m.status)) return true;
+    if(m.status==='FT'&&m.kickoff_utc){
+      const ko=new Date(m.kickoff_utc);
+      // Heute gespielt (Berliner Datum)
+      const today=now.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
+      const matchDay=ko.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
+      return today===matchDay;
+    }
+    return false;
+  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+
+  // Tippbare Spiele in den nächsten 24h
+  const upcoming=dbMatches.filter(m=>{
+    if(!m.kickoff_utc||isTippLocked(m)) return false;
+    const ko=new Date(m.kickoff_utc);
+    return ko>now && ko<=in24;
+  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+
+  // Home matches rendern
+  const homeEl=document.getElementById('home-matches');
+  if(!active.length){
+    homeEl.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:14px">Keine laufenden oder heutigen Spiele</div>';
+  } else {
+    homeEl.innerHTML='<div class="card" style="padding:0 16px">'+active.map(m=>renderMatchRow(m)).join('')+'</div>';
+  }
+
+  // Upcoming rendern
+  const upEl=document.getElementById('home-upcoming');
+  const upEmpty=document.getElementById('home-upcoming-empty');
+  if(!upcoming.length){
+    upEl.innerHTML='';
+    upEmpty.style.display='block';
+  } else {
+    upEmpty.style.display='none';
+    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m)).join('')+'</div>'
+      +'<button class="save-btn" onclick="saveHomeTipps()">Tipps speichern</button>';
+  }
+}
+
+async function refreshHome(){
+  await loadMatches();
+  renderHome();
+  toast('Aktualisiert');
+}
+
+async function saveHomeTipps(){
+  const now=new Date();
+  const in24=new Date(now.getTime()+24*60*60*1000);
+  const upcoming=dbMatches.filter(m=>{
+    if(!m.kickoff_utc||isTippLocked(m)) return false;
+    const ko=new Date(m.kickoff_utc);
+    return ko>now && ko<=in24;
+  });
+  const upserts=[];
+  upcoming.forEach(m=>{
+    const hEl=document.getElementById('t_'+m.match_id+'_h');
+    const aEl=document.getElementById('t_'+m.match_id+'_a');
+    if(!hEl||!aEl) return;
+    const h=hEl.value!==''?parseInt(hEl.value):null;
+    const a=aEl.value!==''?parseInt(aEl.value):null;
+    if(h!==null&&a!==null){
+      upserts.push({player_id:player.id,match_id:m.match_id,home_score:h,away_score:a,updated_at:new Date().toISOString()});
+      myTipps[m.match_id]={h,a};
+    }
+  });
+  if(!upserts.length){toast('Keine Tipps eingegeben');return;}
+  const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
+  if(error){toast('Fehler: '+error.message);return;}
+  renderHome();
+  toast('✓ '+upserts.length+' Tipps gespeichert!');
 }
 function toast(msg){
   const t=document.getElementById('toast');
