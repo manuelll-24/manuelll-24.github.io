@@ -338,11 +338,12 @@ async function startApp(){
   await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
   buildGroupTabs();
   renderCurrentGroup();
-  // Supabase alle 30s pollen (kein direkter API-Kontakt!)
+  renderHome();
+  // Spielstände alle 30s aktualisieren (nur matches, tipps werden beim Speichern geholt)
   refreshTimer=setInterval(async()=>{
     await loadMatches();
     renderCurrentGroup();
-    if(document.getElementById('sec-home').classList.contains('active')) renderHome();
+    renderHome();
   },30000);
 }
 
@@ -443,7 +444,7 @@ function renderCurrentGroup(){
   if(document.getElementById('sec-home').classList.contains('active')) renderHome();
 }
 
-function renderMatchRow(m){
+function renderMatchRow(m, prefix='tipps'){
   const locked=isTippLocked(m);
   const tip=myTipps[m.match_id]||{h:'',a:''};
   const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
@@ -471,11 +472,11 @@ function renderMatchRow(m){
     :`<div class="score-box">
        <input class="score-in" type="number" min="0" max="20"
               value="${tip.h!==''&&tip.h!=null?tip.h:''}"
-              id="t_${m.match_id}_h" placeholder="–"${locked?' disabled':''}>
+              id="${prefix}_${m.match_id}_h" placeholder="–"${locked?' disabled':''}>
        <span class="score-sep">:</span>
        <input class="score-in" type="number" min="0" max="20"
               value="${tip.a!==''&&tip.a!=null?tip.a:''}"
-              id="t_${m.match_id}_a" placeholder="–"${locked?' disabled':''}>
+              id="${prefix}_${m.match_id}_a" placeholder="–"${locked?' disabled':''}>
      </div>`;
 
   return `<div class="match-item">
@@ -507,8 +508,8 @@ async function saveTipps(){
   );
   const upserts=[];
   matches.forEach(m=>{
-    const hEl=document.getElementById(`t_${m.match_id}_h`);
-    const aEl=document.getElementById(`t_${m.match_id}_a`);
+    const hEl=document.getElementById(`tipps_${m.match_id}_h`);
+    const aEl=document.getElementById(`tipps_${m.match_id}_a`);
     if(!hEl||!aEl)return;
     const h=hEl.value!==''?parseInt(hEl.value):null;
     const a=aEl.value!==''?parseInt(aEl.value):null;
@@ -669,7 +670,7 @@ function renderHome(){
   if(!active.length){
     homeEl.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:14px">Keine laufenden oder heutigen Spiele</div>';
   } else {
-    homeEl.innerHTML='<div class="card" style="padding:0 16px">'+active.map(m=>renderMatchRow(m)).join('')+'</div>';
+    homeEl.innerHTML='<div class="card" style="padding:0 16px">'+active.map(m=>renderMatchRow(m,'home')).join('')+'</div>';
   }
 
   // Upcoming rendern
@@ -680,7 +681,7 @@ function renderHome(){
     upEmpty.style.display='block';
   } else {
     upEmpty.style.display='none';
-    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m)).join('')+'</div>'
+    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>'
       +'<button class="save-btn" onclick="saveHomeTipps()">Tipps speichern</button>';
   }
 }
@@ -701,8 +702,8 @@ async function saveHomeTipps(){
   });
   const upserts=[];
   upcoming.forEach(m=>{
-    const hEl=document.getElementById('t_'+m.match_id+'_h');
-    const aEl=document.getElementById('t_'+m.match_id+'_a');
+    const hEl=document.getElementById('home_'+m.match_id+'_h');
+    const aEl=document.getElementById('home_'+m.match_id+'_a');
     if(!hEl||!aEl) return;
     const h=hEl.value!==''?parseInt(hEl.value):null;
     const a=aEl.value!==''?parseInt(aEl.value):null;
