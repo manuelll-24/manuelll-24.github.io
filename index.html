@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -520,7 +520,9 @@ async function saveTipps(){
   if(!upserts.length){toast('Keine neuen Tipps eingegeben');return;}
   const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
   if(error){toast('Fehler: '+error.message);return;}
+  await loadMyTipps();
   renderCurrentGroup();
+  renderHome();
   toast(`✓ ${upserts.length} Tipps gespeichert!`);
 }
 async function saveBonus(){
@@ -532,8 +534,9 @@ async function saveBonus(){
     updated_at:new Date().toISOString()
   };
   const {error}=await sb.from('bonus_tipps').upsert(d,{onConflict:'player_id'});
-  if(error)toast('Fehler: '+error.message);
-  else toast('✓ Bonus-Tipps gespeichert!');
+  if(error){toast('Fehler: '+error.message);return;}
+  await loadBonus();
+  toast('✓ Bonus-Tipps gespeichert!');
 }
 
 // ── RANKING ───────────────────────────────────────────────────
@@ -711,7 +714,9 @@ async function saveHomeTipps(){
   if(!upserts.length){toast('Keine Tipps eingegeben');return;}
   const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
   if(error){toast('Fehler: '+error.message);return;}
+  await loadMyTipps();
   renderHome();
+  renderCurrentGroup();
   toast('✓ '+upserts.length+' Tipps gespeichert!');
 }
 function toast(msg){
