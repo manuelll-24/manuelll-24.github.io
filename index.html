@@ -658,9 +658,10 @@ function renderHome(){
     return false;
   }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
 
-  // Tippbare Spiele in den nächsten 24h
+  // Tippbare Spiele in den nächsten 24h – nur scheduled, kein live/FT
   const upcoming=dbMatches.filter(m=>{
-    if(!m.kickoff_utc||isTippLocked(m)) return false;
+    if(!m.kickoff_utc) return false;
+    if(m.status!=='scheduled') return false;
     const ko=new Date(m.kickoff_utc);
     return ko>now && ko<=in24;
   }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
