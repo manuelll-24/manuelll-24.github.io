@@ -254,7 +254,7 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 let sb=null, player=null;
 let myTipps={};      // match_id -> {h,a}
 let dbMatches=[];    // rows from matches table
-let activeGroup='A';
+let activeTab='A';   // current tab: group letter or KO stage key
 let refreshTimer=null;
 
 // Gruppen-Mapping: Zafronix group_name -> Buchstabe
@@ -350,43 +350,82 @@ async function loadBonus(){
   }
 }
 
-// ── GRUPPEN ────────────────────────────────────────────────────
+// ── TABS & PHASEN ─────────────────────────────────────────────
+// activeTab ist entweder 'A'..'L' (Gruppe) oder ein KO-Stage-Key
+const KO_STAGES = [
+  { key:'round_of_32',  label:'1/32' },
+  { key:'round_of_16',  label:'Achtelfinale' },
+  { key:'quarter_final',label:'Viertelfinale' },
+  { key:'semi_final',   label:'Halbfinale' },
+  { key:'third_place',  label:'Platz 3' },
+  { key:'final',        label:'Finale' },
+];
+
 function getGroupChar(m){
-  // group_name kann sein: "group_a","Group A","A" etc.
   if(!m.group_name) return null;
   const s=m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim();
   return s.charAt(0);
 }
+
 function buildGroupTabs(){
+  // Gruppen aus DB
   const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
-  if(!groups.length) return;
-  activeGroup=groups[0];
-  const tabs=document.getElementById('gtabs');
-  tabs.innerHTML=groups.map(g=>
-    `<button class="gtab ${g===activeGroup?'active':''}" onclick="switchGroup('${g}')">${g}</button>`
-  ).join('');
+  // KO-Stages die tatsächlich Spiele in DB haben
+  const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
+
+  if(!groups.length && !koStages.length) return;
+
+  // Erster Tab
+  if(groups.length) activeTab=groups[0];
+  else activeTab=koStages[0].key;
+
+  renderTabs(groups, koStages);
 }
-function switchGroup(g){
-  activeGroup=g;
-  document.querySelectorAll('.gtab').forEach(b=>{
-    b.classList.toggle('active',b.textContent===g);
-  });
+
+function renderTabs(groups, koStages){
+  const tabs=document.getElementById('gtabs');
+  const groupBtns=groups.map(g=>
+    `<button class="gtab ${g===activeTab?'active':''}" onclick="switchTab('${g}')">${g}</button>`
+  ).join('');
+
+  // KO-Trennlinie nur wenn beide Bereiche vorhanden
+  const sep = groups.length && koStages.length
+    ? `<span style="display:inline-block;width:1px;background:var(--border2);height:20px;margin:0 4px;flex-shrink:0;align-self:center"></span>`
+    : '';
+
+  const koBtns=koStages.map(s=>{
+    const hasLive=dbMatches.some(m=>m.stage===s.key&&['1H','HT','2H','ET','PEN'].includes(m.status));
+    const lbl=hasLive?`<span class="live-dot" style="margin-right:3px"></span>${s.label}`:s.label;
+    return `<button class="gtab ${s.key===activeTab?'active':''}" onclick="switchTab('${s.key}')">${lbl}</button>`;
+  }).join('');
+
+  tabs.innerHTML=groupBtns+sep+koBtns;
+}
+
+function switchTab(key){
+  activeTab=key;
+  // Tabs neu rendern damit aktiver korrekt gesetzt ist
+  const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
+  const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
+  renderTabs(groups, koStages);
   renderCurrentGroup();
 }
 
 function renderCurrentGroup(){
-  const matches=dbMatches.filter(m=>getGroupChar(m)===activeGroup);
+  let matches;
+  const isKO=KO_STAGES.some(s=>s.key===activeTab);
+  if(isKO){
+    matches=dbMatches.filter(m=>m.stage===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+  } else {
+    matches=dbMatches.filter(m=>getGroupChar(m)===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+  }
   if(!matches.length){
     document.getElementById('group-matches').innerHTML=
-      '<div class="loader" style="padding:20px 0">Keine Spiele in dieser Gruppe</div>';
+      '<div class="loader" style="padding:20px 0">Keine Spiele</div>';
     return;
   }
-  document.getElementById('group-matches').innerHTML=
-    matches.map(m=>renderMatchRow(m)).join('');
-
-  // Ergebnis-Ansicht mitaktualisieren wenn sichtbar
-  if(document.getElementById('sec-ergebnisse').classList.contains('active'))
-    renderResults();
+  document.getElementById('group-matches').innerHTML=matches.map(m=>renderMatchRow(m)).join('');
+  if(document.getElementById('sec-ergebnisse').classList.contains('active')) renderResults();
 }
 
 function renderMatchRow(m){
@@ -447,7 +486,10 @@ function renderMatchRow(m){
 
 // ── SAVE ──────────────────────────────────────────────────────
 async function saveTipps(){
-  const matches=dbMatches.filter(m=>getGroupChar(m)===activeGroup&&!isTippLocked(m));
+  const isKO=KO_STAGES.some(s=>s.key===activeTab);
+  const matches=dbMatches.filter(m=>
+    (isKO ? m.stage===activeTab : getGroupChar(m)===activeTab) && !isTippLocked(m)
+  );
   const upserts=[];
   matches.forEach(m=>{
     const hEl=document.getElementById(`t_${m.match_id}_h`);
