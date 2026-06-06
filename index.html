@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -59,8 +59,12 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .match-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
 .match-date{font-size:11px;color:var(--hint)}
 .match-teams{display:grid;grid-template-columns:1fr 90px 1fr;align-items:center;gap:6px}
-.team-name{font-size:14px;font-weight:600}
+.team-name{font-size:13px;font-weight:600;line-height:1.2}
 .team-home{text-align:right}.team-away{text-align:left}
+.team-flag{font-size:20px;line-height:1;display:block;margin-bottom:2px}
+.team-cell{display:flex;flex-direction:column}
+.team-cell.home{align-items:flex-end;text-align:right}
+.team-cell.away{align-items:flex-start;text-align:left}
 .score-box{display:flex;align-items:center;justify-content:center;gap:5px}
 .score-in{width:36px;height:36px;text-align:center;font-size:17px;font-weight:700;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);padding:0;-moz-appearance:textfield}
 .score-in::-webkit-outer-spin-button,.score-in::-webkit-inner-spin-button{-webkit-appearance:none}
@@ -112,60 +116,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 </head>
 <body>
 
-<!-- ══ CONFIG ══════════════════════════════════════════════════ -->
-<div id="cfg-screen" style="display:none">
-  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:50">
-    <h1 style="font-size:17px;font-weight:700">⚽ WM 2026 Tippspiel – Einrichtung</h1>
-  </div>
-  <div class="config-wrap">
-    <div class="config-note">⚙️ Einmalige Einrichtung – danach einfach den Link an alle Freunde schicken!</div>
-
-    <div class="step"><div class="step-num">1</div><div class="step-content">
-      <h3>Supabase Projekt anlegen</h3>
-      <p>Auf <strong>supabase.com</strong> kostenlos registrieren → Neues Projekt → Name: wm2026, Region: <strong>EU (Frankfurt)</strong> oder <strong>EU (Stockholm)</strong>.</p>
-    </div></div>
-
-    <div class="step"><div class="step-num">2</div><div class="step-content">
-      <h3>SQL ausführen</h3>
-      <p>Im <strong>SQL Editor</strong> die Datei <code>setup.sql</code> einfügen und ausführen. Tabellen, RLS-Policies, pg_cron-Job und Ranglisten-View werden erstellt.</p>
-    </div></div>
-
-    <div class="step"><div class="step-num">3</div><div class="step-content">
-      <h3>Zafronix API-Key holen</h3>
-      <p>Auf <strong>api.zafronix.com/signup</strong> kostenlosen Key holen (250 Req/Tag, reicht locker). Key unter Supabase → <strong>Edge Functions → Secrets</strong> als <code>ZAFRONIX_API_KEY</code> speichern.</p>
-    </div></div>
-
-    <div class="step"><div class="step-num">4</div><div class="step-content">
-      <h3>Edge Function deployen</h3>
-      <p>Die Datei <code>supabase/functions/fetch-scores/index.ts</code> mit der Supabase CLI deployen:</p>
-      <div class="code-block">supabase functions deploy fetch-scores --project-ref DEIN_REF</div>
-      <p>Danach in <code>setup.sql</code> die Zeile mit <code>net.http_post</code> anpassen (Projekt-Ref + Service-Role-Key eintragen) und ausführen.</p>
-    </div></div>
-
-    <div class="step"><div class="step-num">5</div><div class="step-content">
-      <h3>Keys hier eintragen</h3>
-    </div></div>
-
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div>
-          <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:5px">Supabase Project URL</label>
-          <input class="input" id="cfg-url" placeholder="https://xxxxx.supabase.co" />
-        </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin-bottom:5px">Supabase Anon Key</label>
-          <input class="input" id="cfg-key" placeholder="eyJhbGciOiJ..." />
-        </div>
-        <button class="btn btn-primary" onclick="saveCfg()">Speichern & Starten →</button>
-      </div>
-    </div>
-
-    <div class="step"><div class="step-num">6</div><div class="step-content">
-      <h3>Hosten & Link teilen</h3>
-      <p>Diese <code>index.html</code> auf <strong>netlify.com/drop</strong> hochladen – fertig! Den Link an alle Freunde schicken.</p>
-    </div></div>
-  </div>
-</div>
+<!-- Kein Config-Screen mehr – Keys sind direkt im Script eingetragen -->
 
 <!-- ══ LOGIN ════════════════════════════════════════════════════ -->
 <div id="login-screen" style="display:none">
@@ -294,9 +245,12 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────
-let SB_URL = localStorage.getItem('sb_url')||'';
-let SB_KEY = localStorage.getItem('sb_key')||'';
+// ════════════════════════════════════════════════════════════
+// ▼▼▼  HIER DEINE KEYS EINTRAGEN (einmalig, dann für alle) ▼▼▼
+const SB_URL = 'https://pgkipeuwdcffefnvrzfj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBna2lwZXV3ZGNmZmVmbnZyemZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDIyMzYsImV4cCI6MjA5NjE3ODIzNn0.xBE-a1o4FgXCr74EH5zaMw7blFToq3pDalzsGp8hKKc';
+// ▲▲▲  Datei speichern & auf Netlify hochladen – fertig!  ▲▲▲
+// ════════════════════════════════════════════════════════════
 
 // ── STATE ─────────────────────────────────────────────────────
 let sb=null, player=null;
@@ -318,27 +272,23 @@ function isTippLocked(match) {
 
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async()=>{
-  if(!SB_URL||!SB_KEY){ show('cfg-screen'); return; }
-  sb = supabase.createClient(SB_URL, SB_KEY);
-  const saved = localStorage.getItem('wm2026_player');
-  if(saved){ player=JSON.parse(saved); await startApp(); }
-  else show('login-screen');
+  try {
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    const saved = localStorage.getItem('wm2026_player');
+    if(saved){ player=JSON.parse(saved); await startApp(); }
+    else show('login-screen');
+  } catch(e) {
+    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
+  }
 });
 
 function show(id){
-  ['cfg-screen','login-screen','main-app'].forEach(i=>
+  ['login-screen','main-app'].forEach(i=>
     document.getElementById(i).style.display=i===id?'block':'none');
 }
 
 // ── CONFIG ────────────────────────────────────────────────────
-function saveCfg(){
-  const u=document.getElementById('cfg-url').value.trim();
-  const k=document.getElementById('cfg-key').value.trim();
-  if(!u||!k){toast('Bitte beide Felder ausfüllen');return;}
-  localStorage.setItem('sb_url',u);
-  localStorage.setItem('sb_key',k);
-  location.reload();
-}
+
 
 // ── LOGIN ─────────────────────────────────────────────────────
 async function doLogin(){
@@ -385,7 +335,7 @@ async function startApp(){
 
 // ── SUPABASE DATA ─────────────────────────────────────────────
 async function loadMatches(){
-  const {data,error}=await sb.from('matches').select('*').order('match_id');
+  const {data,error}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute').order('kickoff_utc');
   if(!error&&data) dbMatches=data;
 }
 async function loadMyTipps(){
@@ -483,9 +433,15 @@ function renderMatchRow(m){
       <div style="display:flex;gap:5px;align-items:center">${statusChip}${ptsChip}</div>
     </div>
     <div class="match-teams">
-      <div class="team-name team-home">${m.home_team}</div>
+      <div class="team-cell home">
+        ${m.flag_home?`<span class="team-flag">${m.flag_home}</span>`:''}
+        <span class="team-name">${m.home_team}</span>
+      </div>
       ${scoreHtml}
-      <div class="team-name team-away">${m.away_team}</div>
+      <div class="team-cell away">
+        ${m.flag_away?`<span class="team-flag">${m.flag_away}</span>`:''}
+        <span class="team-name">${m.away_team}</span>
+      </div>
     </div>
     ${(isLive||isDone)&&tip.h!==''&&tip.h!=null
       ?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:4px">Dein Tipp: ${tip.h}:${tip.a}</div>`:''}
@@ -577,12 +533,18 @@ function renderResults(){
       :`<span style="font-size:11px;color:var(--hint)">—</span>`;
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
       <div style="display:grid;grid-template-columns:1fr 60px 1fr 32px;align-items:center;gap:8px">
-        <div style="font-size:13px;font-weight:600;text-align:right">${m.home_team}</div>
+        <div style="text-align:right">
+          ${m.flag_home?`<div style="font-size:18px">${m.flag_home}</div>`:''}
+          <div style="font-size:12px;font-weight:600">${m.home_team}</div>
+        </div>
         <div>
           <div style="background:var(--text);color:var(--bg);border-radius:8px;padding:3px 0;font-size:16px;font-weight:800;text-align:center">${m.home_score}:${m.away_score}</div>
           ${isLive?`<div style="font-size:10px;color:var(--red);font-weight:600;text-align:center;margin-top:2px">🔴 LIVE</div>`:''}
         </div>
-        <div style="font-size:13px;font-weight:600">${m.away_team}</div>
+        <div>
+          ${m.flag_away?`<div style="font-size:18px">${m.flag_away}</div>`:''}
+          <div style="font-size:12px;font-weight:600">${m.away_team}</div>
+        </div>
         ${ptsHtml}
       </div>
       ${tip?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:3px">Tipp: ${tip.h}:${tip.a}</div>`:''}
