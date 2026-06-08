@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -176,14 +176,14 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section" id="sec-bonus">
       <div class="card">
         <div class="card-title" id="bonus-card-title">Bonus-Tipps · je 5 Punkte</div>
-        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" onblur="autosaveBonusField('weltmeister', this.value)" placeholder="z.B. Brasilien" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" onblur="autosaveBonusField('finalist', this.value)" placeholder="z.B. Frankreich" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" onblur="autosaveBonusField('dritter_platz', this.value)" placeholder="z.B. Deutschland" /></div>
-        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" onblur="autosaveBonusField('torschuetze', this.value)" placeholder="z.B. Mbappé" /></div>
-        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" onblur="autosaveBonusField('assists', this.value)" placeholder="z.B. Musiala" /></div>
-        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" onblur="autosaveBonusField('mvp', this.value)" placeholder="z.B. Bellingham" /></div>
-        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" onblur="autosaveBonusField('youngstar', this.value)" placeholder="z.B. Wirtz" /></div>
-        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" onblur="autosaveBonusField('keeper', this.value)" placeholder="z.B. Neuer" /></div>
+        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" oninput="autosaveBonusField('weltmeister', this.value)" placeholder="z.B. Brasilien" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" oninput="autosaveBonusField('finalist', this.value)" placeholder="z.B. Frankreich" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" oninput="autosaveBonusField('dritter_platz', this.value)" placeholder="z.B. Deutschland" /></div>
+        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" oninput="autosaveBonusField('torschuetze', this.value)" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" oninput="autosaveBonusField('assists', this.value)" placeholder="z.B. Musiala" /></div>
+        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" oninput="autosaveBonusField('mvp', this.value)" placeholder="z.B. Bellingham" /></div>
+        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" oninput="autosaveBonusField('youngstar', this.value)" placeholder="z.B. Wirtz" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" oninput="autosaveBonusField('keeper', this.value)" placeholder="z.B. Neuer" /></div>
       </div>
     </div>
 
@@ -323,7 +323,6 @@ async function startApp(){
   renderHome();
   refreshTimer=setInterval(async()=>{
     await loadMatches();
-    // Nur neu rendern, wenn der Nutzer nicht gerade aktiv ein Tippfeld fokussiert hat (verhindert Tastatur-Einklappen)
     if(document.activeElement && document.activeElement.classList.contains('score-in')) return;
     renderCurrentGroup();
     renderHome();
@@ -366,7 +365,7 @@ async function loadBonus(){
   }
 }
 
-// ── AUTOSAVE FUNKTIONEN (SINKRONISATION REPARIERT) ────────────
+// ── AUTOSAVE FUNKTIONEN (ULTRA-STABIL VIA ONINPUT) ────────────
 async function autosaveMatchTipp(matchId, prefix) {
   const match = dbMatches.find(m => m.match_id === matchId);
   if(!match || isTippLocked(match)) return;
@@ -378,44 +377,43 @@ async function autosaveMatchTipp(matchId, prefix) {
   const hVal = currentH.value.trim();
   const aVal = currentA.value.trim();
 
-  // ABBRUCH: Speichern verhindern, wenn eins der Felder leer oder ungültig ist
+  // Wenn ein Feld komplett gelöscht wird, brechen wir ab (keine Fehlermeldung)
   if (hVal === '' || aVal === '') return;
+
   const h = parseInt(hVal, 10);
   const a = parseInt(aVal, 10);
+
+  // Verhindern, dass falsche Eingaben (NaN) durchrutschen
   if (isNaN(h) || isNaN(a)) return;
 
-  // Erst nach erfolgreicher Validierung den lokalen State aktualisieren
+  // 1. Lokalen State aktualisieren
   myTipps[matchId] = { h, a };
 
-  // Sync das alternative Feld im anderen Tab, falls es im DOM existiert
+  // 2. Synchronisation mit dem jeweils anderen Tab (falls offen), OHNE das Event zu loopen
   const alternativePrefix = prefix === 'tipps' ? 'home' : 'tipps';
   const altH = document.getElementById(`${alternativePrefix}_${matchId}_h`);
   const altA = document.getElementById(`${alternativePrefix}_${matchId}_a`);
-  if(altH) altH.value = hVal;
-  if(altA) altA.value = aVal;
+  if(altH && altH.value !== hVal) altH.value = hVal;
+  if(altA && altA.value !== aVal) altA.value = aVal;
 
-  // Absenden an Supabase
-  const { error } = await sb.from('tipps').upsert({
+  // 3. Im Hintergrund lautlos hochladen
+  await sb.from('tipps').upsert({
     player_id: player.id,
     match_id: matchId,
     home_score: h,
     away_score: a,
     updated_at: new Date().toISOString()
   }, { onConflict: 'player_id,match_id' });
-
-  if(error) toast('Fehler beim Speichern: ' + error.message);
 }
 
 async function autosaveBonusField(columnName, value) {
   if(isBonusDeadlinePassed()) return;
 
-  const { error } = await sb.from('bonus_tipps').upsert({
+  await sb.from('bonus_tipps').upsert({
     player_id: player.id,
     [columnName]: value.trim(),
     updated_at: new Date().toISOString()
   }, { onConflict: 'player_id' });
-
-  if(error) toast('Fehler beim Speichern des Bonus-Tipps');
 }
 
 // ── TABS & PHASEN ─────────────────────────────────────────────
@@ -525,9 +523,9 @@ function renderMatchRow(m, prefix='tipps'){
   const scoreHtml=(isLive||isDone)&&hasScore
     ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
     :`<div class="score-box">
-       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==' '&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" onblur="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==''&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
        <span class="score-sep">:</span>
-       <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" onblur="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
      </div>`;
 
   return `<div class="match-item">
