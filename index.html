@@ -116,7 +116,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 </head>
 <body>
 
-<!-- ══ LOGIN ════════════════════════════════════════════════════ -->
 <div id="login-screen" style="display:none">
   <div class="login-wrap">
     <div style="font-size:52px">⚽</div>
@@ -130,7 +129,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
   </div>
 </div>
 
-<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
 <div id="main-app" style="display:none">
   <div class="app">
     <div class="header">
@@ -145,7 +143,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
-    <!-- USER MENU DROPDOWN -->
     <div id="user-menu" style="display:none;position:fixed;top:56px;right:12px;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;overflow:hidden">
       <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
         <div style="font-size:13px;font-weight:700" id="menu-nick">—</div>
@@ -160,7 +157,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     </div>
     <div id="user-menu-backdrop" onclick="toggleUserMenu()" style="display:none;position:fixed;inset:0;z-index:99"></div>
 
-    <!-- HOME -->
     <div class="section active" id="sec-home">
       <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Aktuell & Heute</div>
       <div id="home-matches"><div class="loader"><div class="spinner"></div>Lade…</div></div>
@@ -170,7 +166,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       <div id="home-upcoming-empty" style="display:none;font-size:13px;color:var(--hint);padding:8px 0">Keine Spiele in den nächsten 24h</div>
     </div>
 
-    <!-- TIPPS -->
     <div class="section" id="sec-tipps">
       <div class="gtabs" id="gtabs"></div>
       <div class="card" style="padding:0 16px">
@@ -178,7 +173,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
-    <!-- BONUS -->
     <div class="section" id="sec-bonus">
       <div class="card">
         <div class="card-title" id="bonus-card-title">Bonus-Tipps · je 5 Punkte</div>
@@ -193,7 +187,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
-    <!-- RANGLISTE -->
     <div class="section" id="sec-rangliste">
       <div class="card" id="my-stats" style="display:none">
         <div class="card-title">Meine Statistik</div>
@@ -211,7 +204,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
-    <!-- REGELN -->
     <div class="section" id="sec-regeln">
       <div class="card">
         <div class="card-title">Punktesystem</div>
@@ -258,9 +250,9 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 // ── STATE ─────────────────────────────────────────────────────
 let sb=null, player=null;
-let myTipps={};      
-let dbMatches=[];    
-let activeTab='A';   
+let myTipps={};
+let dbMatches=[];
+let activeTab='A';
 let refreshTimer=null;
 
 const GROUP_KEYS=['A','B','C','D','E','F','G','H','I','J','K','L'];
@@ -271,7 +263,7 @@ function isTippLocked(match) {
 }
 
 function isBonusDeadlinePassed() {
-  const deadline = new Date('2026-06-27T23:59:59+02:00'); 
+  const deadline = new Date('2026-06-27T23:59:59+02:00');
   return new Date() > deadline;
 }
 
@@ -282,7 +274,7 @@ window.addEventListener('DOMContentLoaded', async()=>{
     const saved = localStorage.getItem('wm2026_player');
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
-    
+
     initDesktopScroll();
   } catch(e) {
     document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
@@ -374,26 +366,35 @@ async function loadBonus(){
   }
 }
 
-// ── AUTOSAVE FUNKTIONEN (LAUTLOS) ─────────────────────────────
+// ── AUTOSAVE FUNKTIONEN (LAUTLOS & FIXIERT) ───────────────────
 async function autosaveMatchTipp(matchId, prefix) {
   const match = dbMatches.find(m => m.match_id === matchId);
   if(!match || isTippLocked(match)) return;
 
-  const hVal = document.getElementById(`${prefix}_${matchId}_h`).value;
-  const aVal = document.getElementById(`${prefix}_${matchId}_a`).value;
+  const hEl = document.getElementById(`${prefix}_${matchId}_h`);
+  const aEl = document.getElementById(`${prefix}_${matchId}_a`);
+  if(!hEl || !aEl) return;
+
+  const hVal = hEl.value.trim();
+  const aVal = aEl.value.trim();
 
   // Sync andere offene Inputs im UI direkt (Home <-> Tipps Tab)
   const alternativePrefix = prefix === 'tipps' ? 'home' : 'tipps';
   const altH = document.getElementById(`${alternativePrefix}_${matchId}_h`);
   const altA = document.getElementById(`${alternativePrefix}_${matchId}_a`);
-  if(altH) altH.value = hVal;
-  if(altA) altA.value = aVal;
 
-  // Speichern triggern sobald beide Felder eine Eingabe haben
+  // Nur synchronisieren, wenn das Element im DOM existiert und Werte da sind
+  if(altH && hVal !== '') altH.value = hVal;
+  if(altA && aVal !== '') altA.value = aVal;
+
+  // Speichern abbrechen, wenn eines der beiden Felder im aktuellen Fokus leer ist
   if (hVal === '' || aVal === '') return;
 
-  const h = parseInt(hVal);
-  const a = parseInt(aVal);
+  const h = parseInt(hVal, 10);
+  const a = parseInt(aVal, 10);
+
+  // Sicherstellen, dass valide Nummern eingegeben wurden
+  if (isNaN(h) || isNaN(a)) return;
 
   myTipps[matchId] = { h, a };
 
@@ -518,7 +519,7 @@ function renderMatchRow(m, prefix='tipps'){
   const statusChip=isLive
     ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
     : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
-    
+
   const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
     :pts===2?`<span class="chip chip-2">+2</span>`
     :pts===1?`<span class="chip chip-1">+1</span>`
