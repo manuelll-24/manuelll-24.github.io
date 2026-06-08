@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -176,14 +176,14 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section" id="sec-bonus">
       <div class="card">
         <div class="card-title" id="bonus-card-title">Bonus-Tipps · je 5 Punkte</div>
-        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" onchange="autosaveBonusField('weltmeister', this.value)" placeholder="z.B. Brasilien" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" onchange="autosaveBonusField('finalist', this.value)" placeholder="z.B. Frankreich" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" onchange="autosaveBonusField('dritter_platz', this.value)" placeholder="z.B. Deutschland" /></div>
-        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" onchange="autosaveBonusField('torschuetze', this.value)" placeholder="z.B. Mbappé" /></div>
-        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" onchange="autosaveBonusField('assists', this.value)" placeholder="z.B. Musiala" /></div>
-        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" onchange="autosaveBonusField('mvp', this.value)" placeholder="z.B. Bellingham" /></div>
-        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" onchange="autosaveBonusField('youngstar', this.value)" placeholder="z.B. Wirtz" /></div>
-        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" onchange="autosaveBonusField('keeper', this.value)" placeholder="z.B. Neuer" /></div>
+        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" oninput="autosaveBonusField('weltmeister', this.value)" placeholder="z.B. Brasilien" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" oninput="autosaveBonusField('finalist', this.value)" placeholder="z.B. Frankreich" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" oninput="autosaveBonusField('dritter_platz', this.value)" placeholder="z.B. Deutschland" /></div>
+        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" oninput="autosaveBonusField('torschuetze', this.value)" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" oninput="autosaveBonusField('assists', this.value)" placeholder="z.B. Musiala" /></div>
+        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" oninput="autosaveBonusField('mvp', this.value)" placeholder="z.B. Bellingham" /></div>
+        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" oninput="autosaveBonusField('youngstar', this.value)" placeholder="z.B. Wirtz" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" oninput="autosaveBonusField('keeper', this.value)" placeholder="z.B. Neuer" /></div>
       </div>
     </div>
 
@@ -220,7 +220,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
           • Aktive Spiele: alle <strong>5 Minuten</strong> aktualisiert.<br>
           • Keine laufenden Spiele: alle <strong>15 Minuten</strong>.<br>
           • Zeitfenster: <strong>18:30 – 08:00 Berliner Zeit</strong>.<br>
-          • Tipps werden beim Verlassen des Feldes <strong>vollautomatisch im Hintergrund gespeichert</strong>.
+          • Tipps werden beim Tippen <strong>vollautomatisch im Hintergrund gespeichert</strong>.
         </div>
       </div>
     </div>
@@ -248,14 +248,20 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 const SB_URL = 'https://pgkipeuwdcffefnvrzfj.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBna2lwZXV3ZGNmZmVmbnZyemZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDIyMzYsImV4cCI6MjA5NjE3ODIzNn0.xBE-a1o4FgXCr74EH5zaMw7blFToq3pDalzsGp8hKKc';
 
-// ── STATE ─────────────────────────────────────────────────────
 let sb=null, player=null;
 let myTipps={};
 let dbMatches=[];
 let activeTab='A';
 let refreshTimer=null;
 
-const GROUP_KEYS=['A','B','C','D','E','F','G','H','I','J','K','L'];
+const KO_STAGES = [
+  { key:'round_of_32',  label:'1/32' },
+  { key:'round_of_16',  label:'Achtelfinale' },
+  { key:'quarter_final',label:'Viertelfinale' },
+  { key:'semi_final',   label:'Halbfinale' },
+  { key:'third_place',  label:'Platz 3' },
+  { key:'final',        label:'Finale' },
+];
 
 function isTippLocked(match) {
   if(!match.kickoff_utc) return false;
@@ -263,22 +269,17 @@ function isTippLocked(match) {
 }
 
 function isBonusDeadlinePassed() {
-  const deadline = new Date('2026-06-27T23:59:59+02:00');
-  return new Date() > deadline;
+  return new Date() > new Date('2026-06-27T23:59:59+02:00');
 }
 
-// ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async()=>{
   try {
     sb = supabase.createClient(SB_URL, SB_KEY);
     const saved = localStorage.getItem('wm2026_player');
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
-
     initDesktopScroll();
-  } catch(e) {
-    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
-  }
+  } catch(e) { document.body.innerHTML = 'Fehler beim Starten.'; }
 });
 
 function show(id){
@@ -286,32 +287,27 @@ function show(id){
     document.getElementById(i).style.display=i===id?'block':'none');
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
 async function doLogin(){
   const nick=document.getElementById('nick-input').value.trim();
   if(!nick||nick.length<2){toast('Mindestens 2 Zeichen');return;}
   try{
     let {data:p}=await sb.from('players').select('*').eq('nick',nick).single();
     if(!p){
-      const {data:np,error}=await sb.from('players').insert({nick}).select().single();
-      if(error)throw error;
+      const {data:np}=await sb.from('players').insert({nick}).select().single();
       p=np;
     }
     player=p;
     localStorage.setItem('wm2026_player',JSON.stringify(p));
     await startApp();
-  }catch(e){toast('Fehler: '+(e.message||'Verbindungsproblem'));}
+  }catch(e){toast('Fehler beim Login');}
 }
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
-});
+
 function logout(){
   clearInterval(refreshTimer);
   localStorage.removeItem('wm2026_player');
-  player=null; show('login-screen');
+  window.location.reload();
 }
 
-// ── START APP ─────────────────────────────────────────────────
 async function startApp(){
   show('main-app');
   document.getElementById('hdr-nick').textContent=player.nick;
@@ -329,22 +325,17 @@ async function startApp(){
   },30000);
 }
 
-// ── SUPABASE DATA ─────────────────────────────────────────────
 async function loadMatches(){
-  const {data,error}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute').order('kickoff_utc');
-  if(!error&&data) dbMatches=data;
+  const {data}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute').order('kickoff_utc');
+  if(data) dbMatches=data;
 }
 async function loadMyTipps(){
   const {data}=await sb.from('tipps').select('*').eq('player_id',player.id);
   myTipps={};
   (data||[]).forEach(t=>{myTipps[t.match_id]={h:t.home_score,a:t.away_score};});
 }
-
 async function loadBonus(){
   const {data}=await sb.from('bonus_tipps').select('*').eq('player_id',player.id).single();
-  const fields = ['b-wm', 'b-finalist', 'b-dritter', 'b-tore', 'b-assists', 'b-mvp', 'b-youngstar', 'b-keeper'];
-  const expired = isBonusDeadlinePassed();
-
   if(data){
     document.getElementById('b-wm').value=data.weltmeister||'';
     document.getElementById('b-finalist').value=data.finalist||'';
@@ -355,63 +346,35 @@ async function loadBonus(){
     document.getElementById('b-youngstar').value=data.youngstar||'';
     document.getElementById('b-keeper').value=data.keeper||'';
   }
-
-  fields.forEach(id => { document.getElementById(id).disabled = expired; });
-  const titleEl = document.getElementById('bonus-card-title');
-  if(expired) {
-    titleEl.innerHTML = 'Bonus-Tipps <span style="color:var(--red)">(Gesperrt - Abgabe vorbei)</span>';
-  } else {
-    titleEl.innerHTML = 'Bonus-Tipps · Automatisches Speichern';
-  }
 }
 
-// ── AUTOSAVE FUNKTIONEN (FEHLER BEHOBEN) ──────────────────────
 async function autosaveMatchTipp(matchId, prefix) {
-  // HIER WAR DER FEHLER: String-Konvertierung hinzugefügt, damit 12 auch "12" entspricht
   const match = dbMatches.find(m => String(m.match_id) === String(matchId));
   if(!match || isTippLocked(match)) return;
-
-  const currentH = document.getElementById(`${prefix}_${matchId}_h`);
-  const currentA = document.getElementById(`${prefix}_${matchId}_a`);
-  if (!currentH || !currentA) return;
-
-  const hVal = currentH.value.trim();
-  const aVal = currentA.value.trim();
-
-  // Abbrechen, wenn eins der Felder leer ist
+  const hVal = document.getElementById(`${prefix}_${matchId}_h`).value.trim();
+  const aVal = document.getElementById(`${prefix}_${matchId}_a`).value.trim();
   if (hVal === '' || aVal === '') return;
-
-  const h = parseInt(hVal, 10);
-  const a = parseInt(aVal, 10);
-
-  // Verhindern, dass falsche Eingaben (NaN) durchrutschen
+  const h = parseInt(hVal, 10), a = parseInt(aVal, 10);
   if (isNaN(h) || isNaN(a)) return;
-
-  // 1. Lokalen State aktualisieren
+  
   myTipps[matchId] = { h, a };
+  
+  const altPrefix = prefix === 'tipps' ? 'home' : 'tipps';
+  const altH = document.getElementById(`${altPrefix}_${matchId}_h`);
+  const altA = document.getElementById(`${altPrefix}_${matchId}_a`);
+  if(altH) altH.value = hVal; if(altA) altA.value = aVal;
 
-  // 2. Synchronisation mit dem anderen Tab
-  const alternativePrefix = prefix === 'tipps' ? 'home' : 'tipps';
-  const altH = document.getElementById(`${alternativePrefix}_${matchId}_h`);
-  const altA = document.getElementById(`${alternativePrefix}_${matchId}_a`);
-  if(altH && altH.value !== hVal) altH.value = hVal;
-  if(altA && altA.value !== aVal) altA.value = aVal;
-
-  // 3. Im Hintergrund lautlos hochladen (Nutzt die DB-ID)
-  const { error } = await sb.from('tipps').upsert({
+  await sb.from('tipps').upsert({
     player_id: player.id,
     match_id: match.match_id, 
     home_score: h,
     away_score: a,
     updated_at: new Date().toISOString()
   }, { onConflict: 'player_id,match_id' });
-
-  if(error) toast('Fehler beim Speichern: ' + error.message);
 }
 
 async function autosaveBonusField(columnName, value) {
   if(isBonusDeadlinePassed()) return;
-
   await sb.from('bonus_tipps').upsert({
     player_id: player.id,
     [columnName]: value.trim(),
@@ -419,83 +382,30 @@ async function autosaveBonusField(columnName, value) {
   }, { onConflict: 'player_id' });
 }
 
-// ── TABS & PHASEN ─────────────────────────────────────────────
-const KO_STAGES = [
-  { key:'round_of_32',  label:'1/32' },
-  { key:'round_of_16',  label:'Achtelfinale' },
-  { key:'quarter_final',label:'Viertelfinale' },
-  { key:'semi_final',   label:'Halbfinale' },
-  { key:'third_place',  label:'Platz 3' },
-  { key:'final',        label:'Finale' },
-];
-
 function getGroupChar(m){
   if(!m.group_name) return null;
-  const s=m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim();
-  return s.charAt(0);
+  return m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim().charAt(0);
 }
 
 function buildGroupTabs(){
   const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
   const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
-  if(!groups.length && !koStages.length) return;
   if(groups.length) activeTab=groups[0];
-  else activeTab=koStages[0].key;
+  else if(koStages.length) activeTab=koStages[0].key;
   renderTabs(groups, koStages);
 }
 
 function renderTabs(groups, koStages){
   const tabs=document.getElementById('gtabs');
-  const groupBtns=groups.map(g=>
-    `<button class="gtab ${g===activeTab?'active':''}" onclick="switchTab('${g}')">${g}</button>`
-  ).join('');
-  const sep = groups.length && koStages.length
-    ? `<span style="display:inline-block;width:1px;background:var(--border2);height:20px;margin:0 4px;flex-shrink:0;align-self:center"></span>`
-    : '';
-  const koBtns=koStages.map(s=>{
-    const hasLive=dbMatches.some(m=>m.stage===s.key&&['1H','HT','2H','ET','PEN'].includes(m.status));
-    const lbl=hasLive?`<span class="live-dot" style="margin-right:3px"></span>${s.label}`:s.label;
-    return `<button class="gtab ${s.key===activeTab?'active':''}" onclick="switchTab('${s.key}')">${lbl}</button>`;
-  }).join('');
-  tabs.innerHTML=groupBtns+sep+koBtns;
+  tabs.innerHTML=groups.map(g=>`<button class="gtab ${g===activeTab?'active':''}" onclick="switchTab('${g}')">${g}</button>`).join('') +
+                 koStages.map(s=>`<button class="gtab ${s.key===activeTab?'active':''}" onclick="switchTab('${s.key}')">${s.label}</button>`).join('');
 }
 
-function switchTab(key){
-  activeTab=key;
-  const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
-  const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
-  renderTabs(groups, koStages);
-  renderCurrentGroup();
-}
-
-function initDesktopScroll() {
-  const gtabs = document.getElementById('gtabs');
-  if(!gtabs) return;
-  let isDown = false, startX, scrollLeft, hasDragged = false;
-  gtabs.addEventListener('wheel', (e) => { e.preventDefault(); gtabs.scrollLeft += e.deltaY * 1.5; }, { passive: false });
-  gtabs.addEventListener('mousedown', (e) => { isDown = true; hasDragged = false; startX = e.pageX - gtabs.offsetLeft; scrollLeft = gtabs.scrollLeft; });
-  gtabs.addEventListener('mouseleave', () => { isDown = false; });
-  gtabs.addEventListener('mouseup', () => { isDown = false; });
-  gtabs.addEventListener('mousemove', (e) => {
-    if(!isDown) return; e.preventDefault();
-    const x = e.pageX - gtabs.offsetLeft; const walk = (x - startX) * 1.5; gtabs.scrollLeft = scrollLeft - walk;
-    if(Math.abs(walk) > 5) hasDragged = true;
-  });
-  gtabs.addEventListener('click', (e) => { if (hasDragged) { e.preventDefault(); e.stopPropagation(); } }, true);
-}
+function switchTab(key){ activeTab=key; buildGroupTabs(); renderCurrentGroup(); }
 
 function renderCurrentGroup(){
-  let matches;
   const isKO=KO_STAGES.some(s=>s.key===activeTab);
-  if(isKO){
-    matches=dbMatches.filter(m=>m.stage===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
-  } else {
-    matches=dbMatches.filter(m=>getGroupChar(m)===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
-  }
-  if(!matches.length){
-    document.getElementById('group-matches').innerHTML='<div class="loader" style="padding:20px 0">Keine Spiele</div>';
-    return;
-  }
+  const matches=dbMatches.filter(m=>isKO?m.stage===activeTab:getGroupChar(m)===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
   document.getElementById('group-matches').innerHTML=matches.map(m=>renderMatchRow(m, 'tipps')).join('');
 }
 
@@ -505,158 +415,34 @@ function renderMatchRow(m, prefix='tipps'){
   const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
   const isDone=m.status==='FT';
   const hasScore=m.home_score!==null&&m.away_score!==null;
-  const pts=isDone&&hasScore?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
-
-  let dateStr='';
-  if(m.kickoff_utc){
-    const d=new Date(m.kickoff_utc);
-    dateStr=d.toLocaleDateString('de',{timeZone:'Europe/Berlin',day:'numeric',month:'short'})
-      +' · '+d.toLocaleTimeString('de',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'});
-  }
-
-  const statusChip=isLive
-    ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
-    : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
-
-  const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
-    :pts===2?`<span class="chip chip-2">+2</span>`
-    :pts===1?`<span class="chip chip-1">+1</span>`
-    :pts===0&&isDone?`<span class="chip chip-0">+0</span>`:'';
-
   const scoreHtml=(isLive||isDone)&&hasScore
     ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
     :`<div class="score-box">
-       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==''&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" onchange="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==''&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
        <span class="score-sep">:</span>
-       <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" onchange="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
      </div>`;
-
-  return `<div class="match-item">
-    <div class="match-top">
-      <span class="match-date">${dateStr}</span>
-      <div style="display:flex;gap:5px;align-items:center">${statusChip}${ptsChip}</div>
-    </div>
-    <div class="match-teams">
-      <div class="team-cell home">
-        ${m.flag_home?`<span class="team-flag">${m.flag_home}</span>`:''}
-        <span class="team-name">${m.home_team}</span>
-      </div>
-      ${scoreHtml}
-      <div class="team-cell away">
-        ${m.flag_away?`<span class="team-flag">${m.flag_away}</span>`:''}
-        <span class="team-name">${m.away_team}</span>
-      </div>
-    </div>
-    ${(isLive||isDone)&&tip.h!==''&&tip.h!=null
-      ?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:4px">Dein Tipp: ${tip.h}:${tip.a}</div>`:''}
-  </div>`;
-}
-
-// ── RANKING ───────────────────────────────────────────────────
-async function loadRanking(){
-  const {data:ranks}=await sb.from('rangliste').select('*');
-  const finished=dbMatches.filter(m=>m.status==='FT').length;
-  const me=ranks?.find(r=>r.nick===player.nick);
-  if(me){
-    document.getElementById('st-pts').textContent=me.punkte||0;
-    document.getElementById('st-exact').textContent=me.exakt||0;
-    document.getElementById('st-tend').textContent=me.tendenz||0;
-    document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
-    document.getElementById('my-stats').style.display='block';
-  }
-  const medals=['🥇','🥈','🥉'];
-  document.getElementById('ranking-list').innerHTML=(ranks||[]).map((p,i)=>{
-    const isMe=p.nick===player.nick;
-    const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
-    return `<div class="rank-row ${isMe?'me':''}">
-      ${pos}
-      <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
-      <div>
-        <div class="rank-pts-val">${p.punkte||0}</div>
-        <div class="rank-pts-sub">${p.exakt||0}✓ ${p.differenz||0}± ${p.tendenz||0}~</div>
-      </div>
-    </div>`;
-  }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele beendet</div>';
-}
-
-// ── HELPERS ───────────────────────────────────────────────────
-function calcPts(tip,res){
-  if(tip.h===null||tip.h===undefined||tip.h==='')return null;
-  const th=parseInt(tip.h),ta=parseInt(tip.a);
-  if(th===res.h&&ta===res.a) return 3;
-  if((th - ta) === (res.h - res.a)) return 2;
-  if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a)) return 1;
-  return 0;
+  return `<div class="match-item"><div class="match-top"><span>${new Date(m.kickoff_utc).toLocaleString('de',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div><div class="match-teams"><div class="team-cell home"><span class="team-flag">${m.flag_home}</span><span class="team-name">${m.home_team}</span></div>${scoreHtml}<div class="team-cell away"><span class="team-flag">${m.flag_away}</span><span class="team-name">${m.away_team}</span></div></div></div>`;
 }
 
 function switchSec(name,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-  else {
-    const nb=document.getElementById('nav-'+name);
-    if(nb) nb.classList.add('active');
-  }
   if(name==='rangliste') loadRanking();
-  if(name==='home') renderHome();
-  if(name==='bonus') loadBonus();
 }
 
-function toggleUserMenu(){
-  const m=document.getElementById('user-menu');
-  const b=document.getElementById('user-menu-backdrop');
-  const open=m.style.display==='block';
-  m.style.display=open?'none':'block';
-  b.style.display=open?'none':'block';
+async function loadRanking(){
+  const {data}=await sb.from('rangliste').select('*');
+  document.getElementById('ranking-list').innerHTML=(data||[]).map((p,i)=>`<div class="rank-row"><div>${i+1}</div><div class="rank-name">${p.nick}</div><div class="rank-pts-val">${p.punkte||0}</div></div>`).join('');
 }
 
-// ── HOME SCREEN ────────────────────────────────────────────────
+function toggleUserMenu(){ const m=document.getElementById('user-menu'); m.style.display=m.style.display==='block'?'none':'block'; }
 function renderHome(){
-  const now=new Date();
-  const in24=new Date(now.getTime()+24*60*60*1000);
-
-  const active=dbMatches.filter(m=>{
-    if(['1H','HT','2H','ET','PEN'].includes(m.status)) return true;
-    if(m.status==='FT'&&m.kickoff_utc){
-      const ko=new Date(m.kickoff_utc);
-      const today=now.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
-      const matchDay=ko.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
-      return today===matchDay;
-    }
-    return false;
-  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
-
-  const upcoming=dbMatches.filter(m=>{
-    if(!m.kickoff_utc) return false;
-    if(m.status!=='scheduled') return false;
-    const ko=new Date(m.kickoff_utc);
-    return ko>now && ko<=in24;
-  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
-
-  const homeEl=document.getElementById('home-matches');
-  if(!active.length){
-    homeEl.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:14px">Keine laufenden oder heutigen Spiele</div>';
-  } else {
-    homeEl.innerHTML='<div class="card" style="padding:0 16px">'+active.map(m=>renderMatchRow(m,'home')).join('')+'</div>';
-  }
-
-  const upEl=document.getElementById('home-upcoming');
-  const upEmpty=document.getElementById('home-upcoming-empty');
-  if(!upcoming.length){
-    upEl.innerHTML='';
-    upEmpty.style.display='block';
-  } else {
-    upEmpty.style.display='none';
-    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>';
-  }
+  const matches=dbMatches.filter(m=>['1H','HT','2H','ET','PEN'].includes(m.status));
+  document.getElementById('home-matches').innerHTML=matches.length?matches.map(m=>renderMatchRow(m,'home')).join(''):'<div class="card" style="text-align:center">Keine Live-Spiele</div>';
 }
-
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg;t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function initDesktopScroll(){ const g=document.getElementById('gtabs'); if(g) g.addEventListener('wheel',(e)=>{e.preventDefault();g.scrollLeft+=e.deltaY*1.5;},{passive:false}); }
 </script>
 </body>
 </html>
