@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -47,6 +47,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
 .input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:16px;transition:border-color .2s;outline:none}
 .input:focus{border-color:var(--blue)}
+.input:disabled{opacity:0.6;cursor:not-allowed}
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
 .btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
@@ -83,6 +84,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .chip-done{background:var(--surface2);color:var(--muted)}
 .save-btn{width:100%;padding:14px;border-radius:var(--r-lg);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:all .15s;margin-top:12px}
 .save-btn:active{transform:scale(.98);opacity:.88}
+.save-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .rank-row:last-child{border-bottom:none}
 .rank-pos{width:28px;font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
@@ -175,7 +177,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 
     <div class="section" id="sec-bonus">
       <div class="card">
-        <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
+        <div class="card-title" id="bonus-card-title">Bonus-Tipps · je 5 Punkte</div>
         <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" placeholder="z.B. Brasilien" /></div>
         <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
         <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" placeholder="z.B. Deutschland" /></div>
@@ -185,7 +187,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" placeholder="z.B. Wirtz" /></div>
         <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" placeholder="z.B. Neuer" /></div>
       </div>
-      <button class="save-btn" onclick="saveBonus()">Bonus-Tipps speichern</button>
+      <button class="save-btn" id="bonus-save-btn" onclick="saveBonus()">Bonus-Tipps speichern</button>
     </div>
 
     <div class="section" id="sec-rangliste">
@@ -263,6 +265,12 @@ function isTippLocked(match) {
   return new Date() >= new Date(match.kickoff_utc);
 }
 
+// Prüft ob die Bonus-Deadline (27. Juni 2026, 23:59:59 Berliner Zeit) überschritten ist
+function isBonusDeadlinePassed() {
+  const deadline = new Date('2026-06-27T23:59:59+02:00'); 
+  return new Date() > deadline;
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async()=>{
   try {
@@ -337,6 +345,10 @@ async function loadMyTipps(){
 
 async function loadBonus(){
   const {data}=await sb.from('bonus_tipps').select('*').eq('player_id',player.id).single();
+  
+  const fields = ['b-wm', 'b-finalist', 'b-dritter', 'b-tore', 'b-assists', 'b-mvp', 'b-youngstar', 'b-keeper'];
+  const expired = isBonusDeadlinePassed();
+
   if(data){
     document.getElementById('b-wm').value=data.weltmeister||'';
     document.getElementById('b-finalist').value=data.finalist||'';
@@ -346,6 +358,23 @@ async function loadBonus(){
     document.getElementById('b-mvp').value=data.mvp||'';
     document.getElementById('b-youngstar').value=data.youngstar||'';
     document.getElementById('b-keeper').value=data.keeper||'';
+  }
+
+  // Inputs und Button sperren falls Deadline abgelaufen
+  fields.forEach(id => {
+    document.getElementById(id).disabled = expired;
+  });
+  
+  const saveBtn = document.getElementById('bonus-save-btn');
+  const titleEl = document.getElementById('bonus-card-title');
+  if(expired) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Abgabezeitraum abgelaufen';
+    titleEl.innerHTML = 'Bonus-Tipps <span style="color:var(--red)">(Gesperrt - Abgabe vorbei)</span>';
+  } else {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Bonus-Tipps speichern';
+    titleEl.innerHTML = 'Bonus-Tipps · je 5 Punkte';
   }
 }
 
@@ -539,6 +568,12 @@ async function saveTipps(){
 }
 
 async function saveBonus(){
+  if(isBonusDeadlinePassed()) {
+    toast('Abgabezeitraum abgelaufen! Tipps können nicht mehr geändert werden.');
+    await loadBonus();
+    return;
+  }
+
   const d={
     player_id:player.id,
     weltmeister:document.getElementById('b-wm').value.trim(),
@@ -605,6 +640,7 @@ function switchSec(name,btn){
   }
   if(name==='rangliste') loadRanking();
   if(name==='home') renderHome();
+  if(name==='bonus') loadBonus();
 }
 
 function toggleUserMenu(){
