@@ -50,9 +50,13 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
 .btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
-.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none}
+
+/* OPTIMIERT: Scrollbar oben im Tipp-Tab für PC/Laptop */
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none}
+.gtabs:active{cursor:grabbing}
 .gtabs::-webkit-scrollbar{display:none}
-.gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500}
+
+.gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500;pointer-events:auto}
 .gtab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
 .match-item{padding:10px 0;border-bottom:1px solid var(--border)}
 .match-item:last-child{border-bottom:none}
@@ -106,13 +110,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .loader{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 .spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--text);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.config-wrap{padding:20px 16px;max-width:480px;margin:0 auto}
-.config-note{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--amber);margin-bottom:16px;line-height:1.55}
-.code-block{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 14px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;overflow-x:auto;margin:6px 0 12px;white-space:pre;line-height:1.65;color:var(--text)}
-.step{display:flex;gap:12px;margin-bottom:18px}
-.step-num{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--bg);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.step-content h3{font-size:14px;font-weight:700;margin-bottom:4px}
-.step-content p{font-size:13px;color:var(--muted);line-height:1.55}
 </style>
 </head>
 <body>
@@ -183,7 +180,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
         <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
       </div>
-      <button class="save-btn" onclick="saveBonus()">Bonus保存</button>
+      <button class="save-btn" onclick="saveBonus()">Bonus-Tipps speichern</button>
     </div>
 
     <div class="section" id="sec-rangliste">
@@ -270,6 +267,9 @@ window.addEventListener('DOMContentLoaded', async()=>{
     const saved = localStorage.getItem('wm2026_player');
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
+    
+    // Initialisiere die Desktop-Scroll-Gesten
+    initDesktopScroll();
   } catch(e) {
     document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
   }
@@ -390,6 +390,58 @@ function switchTab(key){
   renderCurrentGroup();
 }
 
+// ── FIX: Desktop Click & Drag + Mausrad für die gtabs Leiste ──
+function initDesktopScroll() {
+  const gtabs = document.getElementById('gtabs');
+  if(!gtabs) return;
+
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+  let hasDragged = false;
+
+  // 1. Mausrad-Support (Vertikal-Scrollen in Horizontal-Scrollen umwandeln)
+  gtabs.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    gtabs.scrollLeft += e.deltaY * 1.5; // Multiplikator steuert Scroll-Geschwindigkeit
+  }, { passive: false });
+
+  // 2. Click & Drag Support (Ziehen mit gedrückter Maustaste)
+  gtabs.addEventListener('mousedown', (e) => {
+    isDown = true;
+    hasDragged = false;
+    startX = e.pageX - gtabs.offsetLeft;
+    scrollLeft = gtabs.scrollLeft;
+  });
+
+  gtabs.addEventListener('mouseleave', () => {
+    isDown = false;
+  });
+
+  gtabs.addEventListener('mouseup', () => {
+    isDown = false;
+  });
+
+  gtabs.addEventListener('mousemove', (e) => {
+    if(!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - gtabs.offsetLeft;
+    const walk = (x - startX) * 1.5; // Multiplikator steuert Drag-Geschwindigkeit
+    gtabs.scrollLeft = scrollLeft - walk;
+    if(Math.abs(walk) > 5) {
+      hasDragged = true;
+    }
+  });
+
+  // Verhindert, dass das Loslassen nach einem Drag als Button-Klick gewertet wird
+  gtabs.addEventListener('click', (e) => {
+    if (hasDragged) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+}
+
 function renderCurrentGroup(){
   let matches;
   const isKO=KO_STAGES.some(s=>s.key===activeTab);
@@ -425,7 +477,6 @@ function renderMatchRow(m, prefix='tipps'){
     ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
     : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
     
-  // Badge-Zuweisung mit korrekten Klassen für +3 (grün), +2 (blau) und +1 (gelb-orange)
   const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
     :pts===2?`<span class="chip chip-2">+2</span>`
     :pts===1?`<span class="chip chip-1">+1</span>`
@@ -531,11 +582,8 @@ async function loadRanking(){
 function calcPts(tip,res){
   if(tip.h===null||tip.h===undefined||tip.h==='')return null;
   const th=parseInt(tip.h),ta=parseInt(tip.a);
-  // 1. Exakt (3 Punkte)
   if(th===res.h&&ta===res.a) return 3;
-  // 2. Tordifferenz (2 Punkte)
   if((th - ta) === (res.h - res.a)) return 2;
-  // 3. Tendenz (1 Punkt)
   if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a)) return 1;
   return 0;
 }
