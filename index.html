@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -12,7 +12,7 @@
   --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
   --text:#1a1a18;--muted:#6b6a66;--hint:#9c9b97;
   --green:#2d7a3a;--green-bg:#e8f5eb;
-  --amber:#b06d00;--amber-bg:#fff0d4;
+  --amber:#8a5a00;--amber-bg:#fff3d6;
   --blue:#1a5fa8;--blue-bg:#e4effe;
   --red:#b52a2a;--red-bg:#fdeaea;
   --r-md:10px;--r-lg:14px;--r-xl:18px;
@@ -23,7 +23,7 @@
   --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);
   --text:#f0efe9;--muted:#9c9b97;--hint:#6b6a66;
   --green:#5ec96a;--green-bg:#1a3320;
-  --amber:#f3ad21;--amber-bg:#332200;
+  --amber:#f0b940;--amber-bg:#2e2200;
   --blue:#6aadff;--blue-bg:#0d1e35;
   --red:#f07070;--red-bg:#2e1111;
 }}
@@ -47,16 +47,13 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
 .input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:16px;transition:border-color .2s;outline:none}
 .input:focus{border-color:var(--blue)}
-.input:disabled{opacity:0.6;cursor:not-allowed}
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
-
-.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none}
-.gtabs:active{cursor:grabbing}
+.btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none}
 .gtabs::-webkit-scrollbar{display:none}
 .gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500}
 .gtab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-
 .match-item{padding:10px 0;border-bottom:1px solid var(--border)}
 .match-item:last-child{border-bottom:none}
 .match-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
@@ -74,15 +71,14 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .score-in:focus{outline:none;border-color:var(--blue)}
 .score-sep{font-size:15px;font-weight:700;color:var(--muted)}
 .live-result{background:var(--text);color:var(--bg);border-radius:8px;padding:4px 10px;font-size:17px;font-weight:800;text-align:center;min-width:52px}
-
 .chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
 .chip-3{background:var(--green-bg);color:var(--green)}
-.chip-2{background:var(--blue-bg);color:var(--blue)}
 .chip-1{background:var(--amber-bg);color:var(--amber)}
 .chip-0{background:var(--surface2);color:var(--hint)}
 .chip-live{background:var(--red-bg);color:var(--red)}
 .chip-done{background:var(--surface2);color:var(--muted)}
-
+.save-btn{width:100%;padding:14px;border-radius:var(--r-lg);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:all .15s;margin-top:12px}
+.save-btn:active{transform:scale(.98);opacity:.88}
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .rank-row:last-child{border-bottom:none}
 .rank-pos{width:28px;font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
@@ -91,18 +87,15 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .rank-pts-val{font-size:17px;font-weight:800;text-align:right}
 .rank-pts-sub{font-size:11px;color:var(--muted);text-align:right}
 .rank-row.me{background:var(--blue-bg);border-radius:var(--r-md);padding:10px;margin:0 -4px}
-
 .bonus-item{margin-bottom:14px}
 .bonus-label{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .bonus-pts{font-size:11px;background:var(--blue-bg);color:var(--blue);padding:2px 7px;border-radius:10px;font-weight:600}
 .rule-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .rule-row:last-child{border-bottom:none}
 .rule-pts{font-size:20px;font-weight:800;color:var(--blue)}
-
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 .stat-box{background:var(--surface2);border-radius:var(--r-md);padding:10px;text-align:center}
-.stat-val{font-size:22px;font-weight:800}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-val{font-size:22px;font-weight:800}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 .progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
 .progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;display:inline-block;margin-right:4px}
@@ -112,29 +105,41 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .loader{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 .spinner{width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--text);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.config-wrap{padding:20px 16px;max-width:480px;margin:0 auto}
+.config-note{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--amber);margin-bottom:16px;line-height:1.55}
+.code-block{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 14px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;overflow-x:auto;margin:6px 0 12px;white-space:pre;line-height:1.65;color:var(--text)}
+.step{display:flex;gap:12px;margin-bottom:18px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--bg);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.step-content p{font-size:13px;color:var(--muted);line-height:1.55}
 </style>
 </head>
 <body>
 
+<!-- Kein Config-Screen mehr – Keys sind direkt im Script eingetragen -->
+
+<!-- ══ LOGIN ════════════════════════════════════════════════════ -->
 <div id="login-screen" style="display:none">
   <div class="login-wrap">
     <div style="font-size:52px">⚽</div>
     <div style="font-size:26px;font-weight:800;letter-spacing:-.5px">WM 2026</div>
-    <div style="font-size:15px;color:var(--muted);text-align:center;max-width:260px">Tippe alle Spiele und deine Daten sichern sich vollautomatisch</div>
+    <div style="font-size:15px;color:var(--muted);text-align:center;max-width:260px">Tippe alle Spiele und fordere deine Freunde heraus</div>
     <div class="login-card">
       <div style="font-size:15px;font-weight:700">Dein Nickname</div>
       <input class="input" id="nick-input" type="text" placeholder="z.B. Schlaubi" maxlength="20" />
       <button class="btn btn-primary" onclick="doLogin()">Loslegen →</button>
     </div>
+    <div style="font-size:12px;color:var(--hint);text-align:center">Selben Nickname eingeben um Tipps zu laden</div>
   </div>
 </div>
 
+<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
 <div id="main-app" style="display:none">
   <div class="app">
     <div class="header">
       <div>
         <h1>⚽ WM 2026 Tippspiel</h1>
-        <div class="header-sub" id="hdr-sub">Automatische Speicherung aktiv</div>
+        <div class="header-sub" id="hdr-sub">Gruppenphase</div>
       </div>
       <div class="user-pill" onclick="toggleUserMenu()" style="cursor:pointer;position:relative">
         <div class="avatar" id="hdr-av">?</div>
@@ -143,13 +148,14 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
+    <!-- USER MENU DROPDOWN -->
     <div id="user-menu" style="display:none;position:fixed;top:56px;right:12px;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:0 4px 20px rgba(0,0,0,0.15);min-width:180px;overflow:hidden">
       <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
         <div style="font-size:13px;font-weight:700" id="menu-nick">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">Angemeldet</div>
       </div>
       <button onclick="switchSec('regeln',null);toggleUserMenu()" style="width:100%;text-align:left;padding:11px 16px;font-size:14px;border:none;background:none;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)">
-        Regeln & Punktesystem
+        📋 Regeln & Punktesystem
       </button>
       <button onclick="logout()" style="width:100%;text-align:left;padding:11px 16px;font-size:14px;border:none;background:none;color:var(--red);cursor:pointer;font-weight:500">
         → Abmelden
@@ -157,36 +163,39 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     </div>
     <div id="user-menu-backdrop" onclick="toggleUserMenu()" style="display:none;position:fixed;inset:0;z-index:99"></div>
 
+    <!-- HOME -->
     <div class="section active" id="sec-home">
+      <!-- Live / nächste Spiele -->
       <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Aktuell & Heute</div>
       <div id="home-matches"><div class="loader"><div class="spinner"></div>Lade…</div></div>
 
+      <!-- Nächste 24h tippbar -->
       <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 10px">Nächste 24h – jetzt tippen</div>
       <div id="home-upcoming"></div>
       <div id="home-upcoming-empty" style="display:none;font-size:13px;color:var(--hint);padding:8px 0">Keine Spiele in den nächsten 24h</div>
     </div>
 
+    <!-- TIPPS -->
     <div class="section" id="sec-tipps">
       <div class="gtabs" id="gtabs"></div>
       <div class="card" style="padding:0 16px">
         <div id="group-matches"><div class="loader"><div class="spinner"></div>Lade Spiele…</div></div>
       </div>
+      <button class="save-btn" onclick="saveTipps()">Tipps speichern</button>
     </div>
 
+    <!-- BONUS -->
     <div class="section" id="sec-bonus">
       <div class="card">
-        <div class="card-title" id="bonus-card-title">Bonus-Tipps · je 5 Punkte</div>
-        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" oninput="autosaveBonusField('weltmeister', this.value)" placeholder="z.B. Brasilien" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" oninput="autosaveBonusField('finalist', this.value)" placeholder="z.B. Frankreich" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" oninput="autosaveBonusField('dritter_platz', this.value)" placeholder="z.B. Deutschland" /></div>
-        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" oninput="autosaveBonusField('torschuetze', this.value)" placeholder="z.B. Mbappé" /></div>
-        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" oninput="autosaveBonusField('assists', this.value)" placeholder="z.B. Musiala" /></div>
-        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" oninput="autosaveBonusField('mvp', this.value)" placeholder="z.B. Bellingham" /></div>
-        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" oninput="autosaveBonusField('youngstar', this.value)" placeholder="z.B. Wirtz" /></div>
-        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" oninput="autosaveBonusField('keeper', this.value)" placeholder="z.B. Neuer" /></div>
+        <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
+        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" placeholder="z.B. Brasilien" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
       </div>
+      <button class="save-btn" onclick="saveBonus()">Bonus speichern</button>
     </div>
 
+    <!-- RANGLISTE -->
     <div class="section" id="sec-rangliste">
       <div class="card" id="my-stats" style="display:none">
         <div class="card-title">Meine Statistik</div>
@@ -204,23 +213,25 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       </div>
     </div>
 
+    <!-- REGELN -->
     <div class="section" id="sec-regeln">
       <div class="card">
         <div class="card-title">Punktesystem</div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore korrekt</div></div><div class="rule-pts" style="color:var(--green)">3</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tordifferenz</div><div style="font-size:12px;color:var(--muted)">Differenz stimmt (z.B. Tipp 2:0, Ergebnis 4:2 oder Unentschieden)</div></div><div class="rule-pts" style="color:var(--blue)">2</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Nur der Sieger ist korrekt</div></div><div class="rule-pts" style="color:var(--amber)">1</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Bonus-Fragen</div><div style="font-size:12px;color:var(--muted)">Je korrekter Bonus-Tipp (Weltmeister, MVP, etc.)</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore korrekt</div></div><div class="rule-pts">3</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden korrekt</div></div><div class="rule-pts">1</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Weltmeister</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Finalist</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Torschützenkönig</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
       </div>
       <div class="card">
         <div class="card-title">Automatische Ergebnisse</div>
         <div style="font-size:14px;color:var(--muted);line-height:1.75">
           • Ergebnisse werden von der Zafronix API abgerufen.<br>
-          • Abruf läuft automatisch auf dem Server.<br>
+          • Abruf läuft automatisch auf dem Server (Stockholm).<br>
           • Aktive Spiele: alle <strong>5 Minuten</strong> aktualisiert.<br>
           • Keine laufenden Spiele: alle <strong>15 Minuten</strong>.<br>
           • Zeitfenster: <strong>18:30 – 08:00 Berliner Zeit</strong>.<br>
-          • Tipps werden beim Tippen <strong>vollautomatisch im Hintergrund gespeichert</strong>.
+          • Tipps bis zum Anpfiff möglich, danach gesperrt.
         </div>
       </div>
     </div>
@@ -238,6 +249,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       <button class="nav-item" id="nav-rangliste" onclick="switchSec('rangliste',this)">
         <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Rangliste
       </button>
+
     </nav>
   </div>
 </div>
@@ -245,41 +257,41 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
+// ════════════════════════════════════════════════════════════
+// ▼▼▼  HIER DEINE KEYS EINTRAGEN (einmalig, dann für alle) ▼▼▼
 const SB_URL = 'https://pgkipeuwdcffefnvrzfj.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBna2lwZXV3ZGNmZmVmbnZyemZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDIyMzYsImV4cCI6MjA5NjE3ODIzNn0.xBE-a1o4FgXCr74EH5zaMw7blFToq3pDalzsGp8hKKc';
+// ▲▲▲  Datei speichern & auf Netlify hochladen – fertig!  ▲▲▲
+// ════════════════════════════════════════════════════════════
 
+// ── STATE ─────────────────────────────────────────────────────
 let sb=null, player=null;
-let myTipps={};
-let dbMatches=[];
-let activeTab='A';
+let myTipps={};      // match_id -> {h,a}
+let dbMatches=[];    // rows from matches table
+let activeTab='A';   // current tab: group letter or KO stage key
 let refreshTimer=null;
 
-const KO_STAGES = [
-  { key:'round_of_32',  label:'1/32' },
-  { key:'round_of_16',  label:'Achtelfinale' },
-  { key:'quarter_final',label:'Viertelfinale' },
-  { key:'semi_final',   label:'Halbfinale' },
-  { key:'third_place',  label:'Platz 3' },
-  { key:'final',        label:'Finale' },
-];
+// Gruppen-Mapping: Zafronix group_name -> Buchstabe
+// Zafronix liefert z.B. "group_a" oder "Group A"
+const GROUP_KEYS=['A','B','C','D','E','F','G','H','I','J','K','L'];
 
+// Kickoff-Zeiten (Berliner Zeit) für Tipp-Sperre
+// Falls noch kein kickoff_utc aus DB → Tipp immer erlaubt
 function isTippLocked(match) {
   if(!match.kickoff_utc) return false;
   return new Date() >= new Date(match.kickoff_utc);
 }
 
-function isBonusDeadlinePassed() {
-  return new Date() > new Date('2026-06-27T23:59:59+02:00');
-}
-
+// ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async()=>{
   try {
     sb = supabase.createClient(SB_URL, SB_KEY);
     const saved = localStorage.getItem('wm2026_player');
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
-    initDesktopScroll();
-  } catch(e) { document.body.innerHTML = 'Fehler beim Starten.'; }
+  } catch(e) {
+    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
+  }
 });
 
 function show(id){
@@ -287,27 +299,35 @@ function show(id){
     document.getElementById(i).style.display=i===id?'block':'none');
 }
 
+// ── CONFIG ────────────────────────────────────────────────────
+
+
+// ── LOGIN ─────────────────────────────────────────────────────
 async function doLogin(){
   const nick=document.getElementById('nick-input').value.trim();
   if(!nick||nick.length<2){toast('Mindestens 2 Zeichen');return;}
   try{
     let {data:p}=await sb.from('players').select('*').eq('nick',nick).single();
     if(!p){
-      const {data:np}=await sb.from('players').insert({nick}).select().single();
+      const {data:np,error}=await sb.from('players').insert({nick}).select().single();
+      if(error)throw error;
       p=np;
     }
     player=p;
     localStorage.setItem('wm2026_player',JSON.stringify(p));
     await startApp();
-  }catch(e){toast('Fehler beim Login');}
+  }catch(e){toast('Fehler: '+(e.message||'Verbindungsproblem'));}
 }
-
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').style.display!=='none')doLogin();
+});
 function logout(){
   clearInterval(refreshTimer);
   localStorage.removeItem('wm2026_player');
-  window.location.reload();
+  player=null; show('login-screen');
 }
 
+// ── START APP ─────────────────────────────────────────────────
 async function startApp(){
   show('main-app');
   document.getElementById('hdr-nick').textContent=player.nick;
@@ -317,19 +337,18 @@ async function startApp(){
   buildGroupTabs();
   renderCurrentGroup();
   renderHome();
-  
-  // Neuer Timer: Lädt Matches, Tipps UND Bonus-Tipps alle 30s
+  // Spielstände alle 30s aktualisieren (nur matches, tipps werden beim Speichern geholt)
   refreshTimer=setInterval(async()=>{
-    await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
-    if(document.activeElement && document.activeElement.classList.contains('score-in')) return;
+    await loadMatches();
     renderCurrentGroup();
     renderHome();
   },30000);
 }
 
+// ── SUPABASE DATA ─────────────────────────────────────────────
 async function loadMatches(){
-  const {data}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute').order('kickoff_utc');
-  if(data) dbMatches=data;
+  const {data,error}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute').order('kickoff_utc');
+  if(!error&&data) dbMatches=data;
 }
 async function loadMyTipps(){
   const {data}=await sb.from('tipps').select('*').eq('player_id',player.id);
@@ -341,74 +360,86 @@ async function loadBonus(){
   if(data){
     document.getElementById('b-wm').value=data.weltmeister||'';
     document.getElementById('b-finalist').value=data.finalist||'';
-    document.getElementById('b-dritter').value=data.dritter_platz||'';
     document.getElementById('b-tore').value=data.torschuetze||'';
-    document.getElementById('b-assists').value=data.assists||'';
-    document.getElementById('b-mvp').value=data.mvp||'';
-    document.getElementById('b-youngstar').value=data.youngstar||'';
-    document.getElementById('b-keeper').value=data.keeper||'';
   }
 }
 
-async function autosaveMatchTipp(matchId, prefix) {
-  const match = dbMatches.find(m => String(m.match_id) === String(matchId));
-  if(!match || isTippLocked(match)) return;
-  const hVal = document.getElementById(`${prefix}_${matchId}_h`).value.trim();
-  const aVal = document.getElementById(`${prefix}_${matchId}_a`).value.trim();
-  if (hVal === '' || aVal === '') return;
-  const h = parseInt(hVal, 10), a = parseInt(aVal, 10);
-  if (isNaN(h) || isNaN(a)) return;
-  
-  myTipps[matchId] = { h, a };
-  
-  const altPrefix = prefix === 'tipps' ? 'home' : 'tipps';
-  const altH = document.getElementById(`${altPrefix}_${matchId}_h`);
-  const altA = document.getElementById(`${altPrefix}_${matchId}_a`);
-  if(altH) altH.value = hVal; if(altA) altA.value = aVal;
-
-  await sb.from('tipps').upsert({
-    player_id: player.id,
-    match_id: match.match_id, 
-    home_score: h,
-    away_score: a,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'player_id,match_id' });
-}
-
-async function autosaveBonusField(columnName, value) {
-  if(isBonusDeadlinePassed()) return;
-  await sb.from('bonus_tipps').upsert({
-    player_id: player.id,
-    [columnName]: value.trim(),
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'player_id' });
-}
+// ── TABS & PHASEN ─────────────────────────────────────────────
+// activeTab ist entweder 'A'..'L' (Gruppe) oder ein KO-Stage-Key
+const KO_STAGES = [
+  { key:'round_of_32',  label:'1/32' },
+  { key:'round_of_16',  label:'Achtelfinale' },
+  { key:'quarter_final',label:'Viertelfinale' },
+  { key:'semi_final',   label:'Halbfinale' },
+  { key:'third_place',  label:'Platz 3' },
+  { key:'final',        label:'Finale' },
+];
 
 function getGroupChar(m){
   if(!m.group_name) return null;
-  return m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim().charAt(0);
+  const s=m.group_name.toUpperCase().replace('GROUP_','').replace('GROUP ','').trim();
+  return s.charAt(0);
 }
 
 function buildGroupTabs(){
+  // Gruppen aus DB
   const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
+  // KO-Stages die tatsächlich Spiele in DB haben
   const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
+
+  if(!groups.length && !koStages.length) return;
+
+  // Erster Tab
   if(groups.length) activeTab=groups[0];
-  else if(koStages.length) activeTab=koStages[0].key;
+  else activeTab=koStages[0].key;
+
   renderTabs(groups, koStages);
 }
 
 function renderTabs(groups, koStages){
   const tabs=document.getElementById('gtabs');
-  tabs.innerHTML=groups.map(g=>`<button class="gtab ${g===activeTab?'active':''}" onclick="switchTab('${g}')">${g}</button>`).join('') +
-                 koStages.map(s=>`<button class="gtab ${s.key===activeTab?'active':''}" onclick="switchTab('${s.key}')">${s.label}</button>`).join('');
+  const groupBtns=groups.map(g=>
+    `<button class="gtab ${g===activeTab?'active':''}" onclick="switchTab('${g}')">${g}</button>`
+  ).join('');
+
+  // KO-Trennlinie nur wenn beide Bereiche vorhanden
+  const sep = groups.length && koStages.length
+    ? `<span style="display:inline-block;width:1px;background:var(--border2);height:20px;margin:0 4px;flex-shrink:0;align-self:center"></span>`
+    : '';
+
+  const koBtns=koStages.map(s=>{
+    const hasLive=dbMatches.some(m=>m.stage===s.key&&['1H','HT','2H','ET','PEN'].includes(m.status));
+    const lbl=hasLive?`<span class="live-dot" style="margin-right:3px"></span>${s.label}`:s.label;
+    return `<button class="gtab ${s.key===activeTab?'active':''}" onclick="switchTab('${s.key}')">${lbl}</button>`;
+  }).join('');
+
+  tabs.innerHTML=groupBtns+sep+koBtns;
 }
 
-function switchTab(key){ activeTab=key; buildGroupTabs(); renderCurrentGroup(); }
+function switchTab(key){
+  activeTab=key;
+  // Tabs neu rendern damit aktiver korrekt gesetzt ist
+  const groups=[...new Set(dbMatches.map(m=>getGroupChar(m)).filter(Boolean))].sort();
+  const koStages=KO_STAGES.filter(s=>dbMatches.some(m=>m.stage===s.key));
+  renderTabs(groups, koStages);
+  renderCurrentGroup();
+}
 
 function renderCurrentGroup(){
+  let matches;
   const isKO=KO_STAGES.some(s=>s.key===activeTab);
-  const matches=dbMatches.filter(m=>isKO?m.stage===activeTab:getGroupChar(m)===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
-  document.getElementById('group-matches').innerHTML=matches.map(m=>renderMatchRow(m, 'tipps')).join('');
+  if(isKO){
+    matches=dbMatches.filter(m=>m.stage===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+  } else {
+    matches=dbMatches.filter(m=>getGroupChar(m)===activeTab).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+  }
+  if(!matches.length){
+    document.getElementById('group-matches').innerHTML=
+      '<div class="loader" style="padding:20px 0">Keine Spiele</div>';
+    return;
+  }
+  document.getElementById('group-matches').innerHTML=matches.map(m=>renderMatchRow(m)).join('');
+  if(document.getElementById('sec-home').classList.contains('active')) renderHome();
 }
 
 function renderMatchRow(m, prefix='tipps'){
@@ -417,34 +448,312 @@ function renderMatchRow(m, prefix='tipps'){
   const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
   const isDone=m.status==='FT';
   const hasScore=m.home_score!==null&&m.away_score!==null;
+  const pts=isDone&&hasScore?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
+
+  // Datum aus kickoff_utc in Berliner Zeit
+  let dateStr='';
+  if(m.kickoff_utc){
+    const d=new Date(m.kickoff_utc);
+    dateStr=d.toLocaleDateString('de',{timeZone:'Europe/Berlin',day:'numeric',month:'short'})
+      +' · '+d.toLocaleTimeString('de',{timeZone:'Europe/Berlin',hour:'2-digit',minute:'2-digit'});
+  }
+
+  const statusChip=isLive
+    ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
+    : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
+  const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
+    :pts===1?`<span class="chip chip-1">+1</span>`
+    :pts===0&&isDone?`<span class="chip chip-0">+0</span>`:'';
+
   const scoreHtml=(isLive||isDone)&&hasScore
     ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
     :`<div class="score-box">
-       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==''&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20"
+              value="${tip.h!==''&&tip.h!=null?tip.h:''}"
+              id="${prefix}_${m.match_id}_h"
+              oninput="autosaveMatchTipp(${m.match_id},'${prefix}')"
+              placeholder="–"${locked?' disabled':''}>
        <span class="score-sep">:</span>
-       <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" oninput="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20"
+              value="${tip.a!==''&&tip.a!=null?tip.a:''}"
+              id="${prefix}_${m.match_id}_a"
+              oninput="autosaveMatchTipp(${m.match_id},'${prefix}')"
+              placeholder="–"${locked?' disabled':''}>
      </div>`;
-  return `<div class="match-item"><div class="match-top"><span>${new Date(m.kickoff_utc).toLocaleString('de',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div><div class="match-teams"><div class="team-cell home"><span class="team-flag">${m.flag_home}</span><span class="team-name">${m.home_team}</span></div>${scoreHtml}<div class="team-cell away"><span class="team-flag">${m.flag_away}</span><span class="team-name">${m.away_team}</span></div></div></div>`;
+
+  return `<div class="match-item">
+    <div class="match-top">
+      <span class="match-date">${dateStr}</span>
+      <div style="display:flex;gap:5px;align-items:center">${statusChip}${ptsChip}</div>
+    </div>
+    <div class="match-teams">
+      <div class="team-cell home">
+        ${m.flag_home?`<span class="team-flag">${m.flag_home}</span>`:''}
+        <span class="team-name">${m.home_team}</span>
+      </div>
+      ${scoreHtml}
+      <div class="team-cell away">
+        ${m.flag_away?`<span class="team-flag">${m.flag_away}</span>`:''}
+        <span class="team-name">${m.away_team}</span>
+      </div>
+    </div>
+    ${(isLive||isDone)&&tip.h!==''&&tip.h!=null
+      ?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:4px">Dein Tipp: ${tip.h}:${tip.a}</div>`:''}
+  </div>`;
 }
 
+// ── SAVE ──────────────────────────────────────────────────────
+async function saveTipps(){
+  const isKO=KO_STAGES.some(s=>s.key===activeTab);
+  const matches=dbMatches.filter(m=>
+    (isKO ? m.stage===activeTab : getGroupChar(m)===activeTab) && !isTippLocked(m)
+  );
+  const upserts=[];
+  matches.forEach(m=>{
+    const hEl=document.getElementById(`tipps_${m.match_id}_h`);
+    const aEl=document.getElementById(`tipps_${m.match_id}_a`);
+    if(!hEl||!aEl)return;
+    const h=hEl.value!==''?parseInt(hEl.value):null;
+    const a=aEl.value!==''?parseInt(aEl.value):null;
+    if(h!==null&&a!==null){
+      upserts.push({player_id:player.id,match_id:m.match_id,home_score:h,away_score:a,updated_at:new Date().toISOString()});
+      myTipps[m.match_id]={h,a};
+    }
+  });
+  if(!upserts.length){toast('Keine neuen Tipps eingegeben');return;}
+  const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
+  if(error){toast('Fehler: '+error.message);return;}
+  await loadMyTipps();
+  renderCurrentGroup();
+  renderHome();
+  toast(`✓ ${upserts.length} Tipps gespeichert!`);
+}
+async function saveBonus(){
+  const d={
+    player_id:player.id,
+    weltmeister:document.getElementById('b-wm').value,
+    finalist:document.getElementById('b-finalist').value,
+    torschuetze:document.getElementById('b-tore').value,
+    updated_at:new Date().toISOString()
+  };
+  const {error}=await sb.from('bonus_tipps').upsert(d,{onConflict:'player_id'});
+  if(error){toast('Fehler: '+error.message);return;}
+  await loadBonus();
+  toast('✓ Bonus-Tipps gespeichert!');
+}
+
+// Autosave beim Tippen (oninput) – speichert sofort wenn beide Felder ausgefüllt
+async function autosaveMatchTipp(matchId, prefix){
+  const mid=parseInt(matchId,10);
+  const match=dbMatches.find(m=>m.match_id===mid);
+  if(!match||isTippLocked(match)) return;
+  const hEl=document.getElementById(`${prefix}_${mid}_h`);
+  const aEl=document.getElementById(`${prefix}_${mid}_a`);
+  if(!hEl||!aEl) return;
+  if(hEl.value===''||aEl.value==='') return;
+  const h=parseInt(hEl.value,10), a=parseInt(aEl.value,10);
+  if(isNaN(h)||isNaN(a)) return;
+  // Lokal speichern
+  myTipps[mid]={h,a};
+  // Anderen Tab synchronisieren
+  const alt=prefix==='tipps'?'home':'tipps';
+  const altH=document.getElementById(`${alt}_${mid}_h`);
+  const altA=document.getElementById(`${alt}_${mid}_a`);
+  if(altH) altH.value=hEl.value;
+  if(altA) altA.value=aEl.value;
+  // Supabase
+  const {error}=await sb.from('tipps').upsert({
+    player_id:player.id, match_id:mid,
+    home_score:h, away_score:a,
+    updated_at:new Date().toISOString()
+  },{onConflict:'player_id,match_id'});
+  if(error) console.error('Autosave Fehler:',error.message);
+}
+async function loadRanking(){
+  // Ranglisten-View direkt abfragen
+  const {data:ranks}=await sb.from('rangliste').select('*');
+  const finished=dbMatches.filter(m=>m.status==='FT').length;
+  const me=ranks?.find(r=>r.nick===player.nick);
+  if(me){
+    document.getElementById('st-pts').textContent=me.punkte||0;
+    document.getElementById('st-exact').textContent=me.exakt||0;
+    document.getElementById('st-tend').textContent=me.tendenz||0;
+    document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
+    document.getElementById('my-stats').style.display='block';
+  }
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('ranking-list').innerHTML=(ranks||[]).map((p,i)=>{
+    const isMe=p.nick===player.nick;
+    const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
+    return `<div class="rank-row ${isMe?'me':''}">
+      ${pos}
+      <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
+      <div>
+        <div class="rank-pts-val">${p.punkte||0}</div>
+        <div class="rank-pts-sub">${p.exakt||0}✓ ${p.tendenz||0}~</div>
+      </div>
+    </div>`;
+  }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele beendet</div>';
+}
+
+// ── RESULTS ───────────────────────────────────────────────────
+function renderResults(){
+  const shown=dbMatches.filter(m=>
+    ['1H','HT','2H','ET','PEN','FT'].includes(m.status)&&
+    m.home_score!==null&&m.away_score!==null
+  );
+  if(!shown.length){
+    document.getElementById('results-list').innerHTML=
+      '<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele gestartet</div>';
+    return;
+  }
+  document.getElementById('results-list').innerHTML=shown.map(m=>{
+    const tip=myTipps[m.match_id];
+    const isDone=m.status==='FT';
+    const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
+    const pts=isDone&&tip?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
+    const ptsHtml=pts===3?`<span class="chip chip-3">+3</span>`
+      :pts===1?`<span class="chip chip-1">+1</span>`
+      :pts===0?`<span class="chip chip-0">+0</span>`
+      :`<span style="font-size:11px;color:var(--hint)">—</span>`;
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr 32px;align-items:center;gap:8px">
+        <div style="text-align:right">
+          ${m.flag_home?`<div style="font-size:18px">${m.flag_home}</div>`:''}
+          <div style="font-size:12px;font-weight:600">${m.home_team}</div>
+        </div>
+        <div>
+          <div style="background:var(--text);color:var(--bg);border-radius:8px;padding:3px 0;font-size:16px;font-weight:800;text-align:center">${m.home_score}:${m.away_score}</div>
+          ${isLive?`<div style="font-size:10px;color:var(--red);font-weight:600;text-align:center;margin-top:2px">🔴 LIVE</div>`:''}
+        </div>
+        <div>
+          ${m.flag_away?`<div style="font-size:18px">${m.flag_away}</div>`:''}
+          <div style="font-size:12px;font-weight:600">${m.away_team}</div>
+        </div>
+        ${ptsHtml}
+      </div>
+      ${tip?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:3px">Tipp: ${tip.h}:${tip.a}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function calcPts(tip,res){
+  if(tip.h===null||tip.h===undefined||tip.h==='')return null;
+  const th=parseInt(tip.h),ta=parseInt(tip.a);
+  if(th===res.h&&ta===res.a)return 3;
+  if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a))return 1;
+  return 0;
+}
 function switchSec(name,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
+  // nav button: btn kann null sein (bei Aufruf aus Menü)
+  if(btn) btn.classList.add('active');
+  else {
+    const nb=document.getElementById('nav-'+name);
+    if(nb) nb.classList.add('active');
+  }
   if(name==='rangliste') loadRanking();
+  if(name==='home') renderHome();
 }
 
-async function loadRanking(){
-  const {data}=await sb.from('rangliste').select('*');
-  document.getElementById('ranking-list').innerHTML=(data||[]).map((p,i)=>`<div class="rank-row"><div>${i+1}</div><div class="rank-name">${p.nick}</div><div class="rank-pts-val">${p.punkte||0}</div></div>`).join('');
+// ── USER MENU ──────────────────────────────────────────────────
+function toggleUserMenu(){
+  const m=document.getElementById('user-menu');
+  const b=document.getElementById('user-menu-backdrop');
+  const open=m.style.display==='block';
+  m.style.display=open?'none':'block';
+  b.style.display=open?'none':'block';
 }
 
-function toggleUserMenu(){ const m=document.getElementById('user-menu'); m.style.display=m.style.display==='block'?'none':'block'; }
+// ── HOME SCREEN ────────────────────────────────────────────────
 function renderHome(){
-  const matches=dbMatches.filter(m=>['1H','HT','2H','ET','PEN'].includes(m.status));
-  document.getElementById('home-matches').innerHTML=matches.length?matches.map(m=>renderMatchRow(m,'home')).join(''):'<div class="card" style="text-align:center">Keine Live-Spiele</div>';
+  const now=new Date();
+  const in24=new Date(now.getTime()+24*60*60*1000);
+
+  // Laufende + heute gespielte Spiele
+  const active=dbMatches.filter(m=>{
+    if(['1H','HT','2H','ET','PEN'].includes(m.status)) return true;
+    if(m.status==='FT'&&m.kickoff_utc){
+      const ko=new Date(m.kickoff_utc);
+      // Heute gespielt (Berliner Datum)
+      const today=now.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
+      const matchDay=ko.toLocaleDateString('de',{timeZone:'Europe/Berlin'});
+      return today===matchDay;
+    }
+    return false;
+  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+
+  // Tippbare Spiele in den nächsten 24h – nur scheduled, kein live/FT
+  const upcoming=dbMatches.filter(m=>{
+    if(!m.kickoff_utc) return false;
+    if(m.status!=='scheduled') return false;
+    const ko=new Date(m.kickoff_utc);
+    return ko>now && ko<=in24;
+  }).sort((a,b)=>new Date(a.kickoff_utc)-new Date(b.kickoff_utc));
+
+  // Home matches rendern
+  const homeEl=document.getElementById('home-matches');
+  if(!active.length){
+    homeEl.innerHTML='<div class="card" style="text-align:center;padding:20px;color:var(--muted);font-size:14px">Keine laufenden oder heutigen Spiele</div>';
+  } else {
+    homeEl.innerHTML='<div class="card" style="padding:0 16px">'+active.map(m=>renderMatchRow(m,'home')).join('')+'</div>';
+  }
+
+  // Upcoming rendern
+  const upEl=document.getElementById('home-upcoming');
+  const upEmpty=document.getElementById('home-upcoming-empty');
+  if(!upcoming.length){
+    upEl.innerHTML='';
+    upEmpty.style.display='block';
+  } else {
+    upEmpty.style.display='none';
+    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>'
+      +'<button class="save-btn" onclick="saveHomeTipps()">Tipps speichern</button>';
+  }
 }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg;t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
-function initDesktopScroll(){ const g=document.getElementById('gtabs'); if(g) g.addEventListener('wheel',(e)=>{e.preventDefault();g.scrollLeft+=e.deltaY*1.5;},{passive:false}); }
+
+async function refreshHome(){
+  await loadMatches();
+  renderHome();
+  toast('Aktualisiert');
+}
+
+async function saveHomeTipps(){
+  const now=new Date();
+  const in24=new Date(now.getTime()+24*60*60*1000);
+  const upcoming=dbMatches.filter(m=>{
+    if(!m.kickoff_utc||isTippLocked(m)) return false;
+    const ko=new Date(m.kickoff_utc);
+    return ko>now && ko<=in24;
+  });
+  const upserts=[];
+  upcoming.forEach(m=>{
+    const hEl=document.getElementById('home_'+m.match_id+'_h');
+    const aEl=document.getElementById('home_'+m.match_id+'_a');
+    if(!hEl||!aEl) return;
+    const h=hEl.value!==''?parseInt(hEl.value):null;
+    const a=aEl.value!==''?parseInt(aEl.value):null;
+    if(h!==null&&a!==null){
+      upserts.push({player_id:player.id,match_id:m.match_id,home_score:h,away_score:a,updated_at:new Date().toISOString()});
+      myTipps[m.match_id]={h,a};
+    }
+  });
+  if(!upserts.length){toast('Keine Tipps eingegeben');return;}
+  const {error}=await sb.from('tipps').upsert(upserts,{onConflict:'player_id,match_id'});
+  if(error){toast('Fehler: '+error.message);return;}
+  await loadMyTipps();
+  renderHome();
+  renderCurrentGroup();
+  toast('✓ '+upserts.length+' Tipps gespeichert!');
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
 </script>
 </body>
 </html>
