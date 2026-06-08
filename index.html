@@ -317,8 +317,10 @@ async function startApp(){
   buildGroupTabs();
   renderCurrentGroup();
   renderHome();
+  
+  // Neuer Timer: Lädt Matches, Tipps UND Bonus-Tipps alle 30s
   refreshTimer=setInterval(async()=>{
-    await loadMatches();
+    await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
     if(document.activeElement && document.activeElement.classList.contains('score-in')) return;
     renderCurrentGroup();
     renderHome();
