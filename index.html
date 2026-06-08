@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>⚽ WM 2026 Tippspiel</title>
+<title>WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -366,38 +366,35 @@ async function loadBonus(){
   }
 }
 
-// ── AUTOSAVE FUNKTIONEN (LAUTLOS & FIXIERT) ───────────────────
+// ── AUTOSAVE FUNKTIONEN (SINKRONISATION REPARIERT) ────────────
 async function autosaveMatchTipp(matchId, prefix) {
   const match = dbMatches.find(m => m.match_id === matchId);
   if(!match || isTippLocked(match)) return;
 
-  const hEl = document.getElementById(`${prefix}_${matchId}_h`);
-  const aEl = document.getElementById(`${prefix}_${matchId}_a`);
-  if(!hEl || !aEl) return;
+  const currentH = document.getElementById(`${prefix}_${matchId}_h`);
+  const currentA = document.getElementById(`${prefix}_${matchId}_a`);
+  if (!currentH || !currentA) return;
 
-  const hVal = hEl.value.trim();
-  const aVal = aEl.value.trim();
+  const hVal = currentH.value.trim();
+  const aVal = currentA.value.trim();
 
-  // Sync andere offene Inputs im UI direkt (Home <-> Tipps Tab)
+  // ABBRUCH: Speichern verhindern, wenn eins der Felder leer oder ungültig ist
+  if (hVal === '' || aVal === '') return;
+  const h = parseInt(hVal, 10);
+  const a = parseInt(aVal, 10);
+  if (isNaN(h) || isNaN(a)) return;
+
+  // Erst nach erfolgreicher Validierung den lokalen State aktualisieren
+  myTipps[matchId] = { h, a };
+
+  // Sync das alternative Feld im anderen Tab, falls es im DOM existiert
   const alternativePrefix = prefix === 'tipps' ? 'home' : 'tipps';
   const altH = document.getElementById(`${alternativePrefix}_${matchId}_h`);
   const altA = document.getElementById(`${alternativePrefix}_${matchId}_a`);
+  if(altH) altH.value = hVal;
+  if(altA) altA.value = aVal;
 
-  // Nur synchronisieren, wenn das Element im DOM existiert und Werte da sind
-  if(altH && hVal !== '') altH.value = hVal;
-  if(altA && aVal !== '') altA.value = aVal;
-
-  // Speichern abbrechen, wenn eines der beiden Felder im aktuellen Fokus leer ist
-  if (hVal === '' || aVal === '') return;
-
-  const h = parseInt(hVal, 10);
-  const a = parseInt(aVal, 10);
-
-  // Sicherstellen, dass valide Nummern eingegeben wurden
-  if (isNaN(h) || isNaN(a)) return;
-
-  myTipps[matchId] = { h, a };
-
+  // Absenden an Supabase
   const { error } = await sb.from('tipps').upsert({
     player_id: player.id,
     match_id: matchId,
@@ -528,7 +525,7 @@ function renderMatchRow(m, prefix='tipps'){
   const scoreHtml=(isLive||isDone)&&hasScore
     ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
     :`<div class="score-box">
-       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==''&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" onblur="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
+       <input class="score-in" type="number" min="0" max="20" value="${tip.h!==' '&&tip.h!=null?tip.h:''}" id="${prefix}_${m.match_id}_h" onblur="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
        <span class="score-sep">:</span>
        <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" onblur="autosaveMatchTipp('${m.match_id}', '${prefix}')" placeholder="–"${locked?' disabled':''}>
      </div>`;
