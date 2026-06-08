@@ -74,6 +74,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
 .chip-3{background:var(--green-bg);color:var(--green)}
 .chip-1{background:var(--amber-bg);color:var(--amber)}
+.chip-2{background:var(--blue-bg);color:var(--blue)}
 .chip-0{background:var(--surface2);color:var(--hint)}
 .chip-live{background:var(--red-bg);color:var(--red)}
 .chip-done{background:var(--surface2);color:var(--muted)}
@@ -181,18 +182,22 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
       <div class="card" style="padding:0 16px">
         <div id="group-matches"><div class="loader"><div class="spinner"></div>Lade Spiele…</div></div>
       </div>
-      <button class="save-btn" onclick="saveTipps()">Tipps speichern</button>
     </div>
 
     <!-- BONUS -->
     <div class="section" id="sec-bonus">
       <div class="card">
         <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
-        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" placeholder="z.B. Brasilien" /></div>
-        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
-        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Wird automatisch gespeichert · Bis Turnierende änderbar</div>
+        <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" oninput="autosaveBonusField('weltmeister',this.value)" placeholder="z.B. Brasilien" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" oninput="autosaveBonusField('finalist',this.value)" placeholder="z.B. Frankreich" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" oninput="autosaveBonusField('dritter_platz',this.value)" placeholder="z.B. Deutschland" /></div>
+        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" oninput="autosaveBonusField('torschuetze',this.value)" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" oninput="autosaveBonusField('assists',this.value)" placeholder="z.B. Musiala" /></div>
+        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" oninput="autosaveBonusField('mvp',this.value)" placeholder="z.B. Bellingham" /></div>
+        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" oninput="autosaveBonusField('youngstar',this.value)" placeholder="z.B. Wirtz" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" oninput="autosaveBonusField('keeper',this.value)" placeholder="z.B. Neuer" /></div>
       </div>
-      <button class="save-btn" onclick="saveBonus()">Bonus speichern</button>
     </div>
 
     <!-- RANGLISTE -->
@@ -216,22 +221,33 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <!-- REGELN -->
     <div class="section" id="sec-regeln">
       <div class="card">
-        <div class="card-title">Punktesystem</div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore korrekt</div></div><div class="rule-pts">3</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden korrekt</div></div><div class="rule-pts">1</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Weltmeister</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Finalist</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Torschützenkönig</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="card-title">Spieltipps – Punktesystem</div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore genau richtig</div></div><div class="rule-pts" style="color:var(--green)">3</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tordifferenz</div><div style="font-size:12px;color:var(--muted)">z.B. Tipp 2:0 – Ergebnis 3:1 (beide +2)</div></div><div class="rule-pts" style="color:var(--blue)">2</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden richtig</div></div><div class="rule-pts" style="color:var(--amber)">1</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Falsch oder kein Tipp</div><div style="font-size:12px;color:var(--muted)">Tendenz falsch</div></div><div class="rule-pts" style="color:var(--hint);font-size:16px">0</div></div>
       </div>
       <div class="card">
-        <div class="card-title">Automatische Ergebnisse</div>
+        <div class="card-title">Bonus-Tipps – je 5 Punkte</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.9">
+          🏆 Weltmeister<br>
+          🥈 Finalist<br>
+          🥉 3. Platz<br>
+          👟 Torschützenkönig<br>
+          🎯 Meiste Assists<br>
+          ⭐ MVP (Bester Spieler)<br>
+          💎 Bester Youngstar<br>
+          🧤 Bester Keeper
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--hint)">Groß-/Kleinschreibung wird ignoriert. Bis Turnierende änderbar.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hinweise</div>
         <div style="font-size:14px;color:var(--muted);line-height:1.75">
-          • Ergebnisse werden von der Zafronix API abgerufen.<br>
-          • Abruf läuft automatisch auf dem Server (Stockholm).<br>
-          • Aktive Spiele: alle <strong>5 Minuten</strong> aktualisiert.<br>
-          • Keine laufenden Spiele: alle <strong>15 Minuten</strong>.<br>
-          • Zeitfenster: <strong>18:30 – 08:00 Berliner Zeit</strong>.<br>
-          • Tipps bis zum Anpfiff möglich, danach gesperrt.
+          • Tipps werden <strong>vollautomatisch gespeichert</strong> beim Tippen.<br>
+          • Tipps bis zum <strong>Anpfiff</strong> des jeweiligen Spiels möglich.<br>
+          • Ergebnisse werden alle <strong>15 Min</strong> (live: 5 Min) aktualisiert.<br>
+          • Zeitfenster: <strong>18:30 – 08:00 Berliner Zeit</strong>.
         </div>
       </div>
     </div>
@@ -360,7 +376,12 @@ async function loadBonus(){
   if(data){
     document.getElementById('b-wm').value=data.weltmeister||'';
     document.getElementById('b-finalist').value=data.finalist||'';
+    document.getElementById('b-dritter').value=data.dritter_platz||'';
     document.getElementById('b-tore').value=data.torschuetze||'';
+    document.getElementById('b-assists').value=data.assists||'';
+    document.getElementById('b-mvp').value=data.mvp||'';
+    document.getElementById('b-youngstar').value=data.youngstar||'';
+    document.getElementById('b-keeper').value=data.keeper||'';
   }
 }
 
@@ -528,19 +549,7 @@ async function saveTipps(){
   renderHome();
   toast(`✓ ${upserts.length} Tipps gespeichert!`);
 }
-async function saveBonus(){
-  const d={
-    player_id:player.id,
-    weltmeister:document.getElementById('b-wm').value,
-    finalist:document.getElementById('b-finalist').value,
-    torschuetze:document.getElementById('b-tore').value,
-    updated_at:new Date().toISOString()
-  };
-  const {error}=await sb.from('bonus_tipps').upsert(d,{onConflict:'player_id'});
-  if(error){toast('Fehler: '+error.message);return;}
-  await loadBonus();
-  toast('✓ Bonus-Tipps gespeichert!');
-}
+
 
 // Autosave beim Tippen (oninput) – speichert sofort wenn beide Felder ausgefüllt
 async function autosaveMatchTipp(matchId, prefix){
@@ -642,6 +651,7 @@ function calcPts(tip,res){
   if(tip.h===null||tip.h===undefined||tip.h==='')return null;
   const th=parseInt(tip.h),ta=parseInt(tip.a);
   if(th===res.h&&ta===res.a)return 3;
+  if((th-ta)===(res.h-res.a))return 2; // gleiche Tordifferenz
   if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a))return 1;
   return 0;
 }
