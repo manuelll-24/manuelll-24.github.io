@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>⚽ WM 2026 Tippspiel</title>
+<title>WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -51,7 +51,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
 .btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
 
-/* OPTIMIERT: Scrollbar oben im Tipp-Tab für PC/Laptop */
 .gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none}
 .gtabs:active{cursor:grabbing}
 .gtabs::-webkit-scrollbar{display:none}
@@ -100,7 +99,8 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .rule-pts{font-size:20px;font-weight:800;color:var(--blue)}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 .stat-box{background:var(--surface2);border-radius:var(--r-md);padding:10px;text-align:center}
-.stat-val{font-size:22px;font-weight:800}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-val{font-size:22px;font-weight:800}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 .progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
 .progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;display:inline-block;margin-right:4px}
@@ -178,7 +178,12 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
         <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" placeholder="z.B. Brasilien" /></div>
         <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" placeholder="z.B. Frankreich" /></div>
-        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" placeholder="z.B. Deutschland" /></div>
+        <div class="bonus-item"><div class="bonus-label">👟 Torschützenkönig <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-tore" placeholder="z.B. Mbappé" /></div>
+        <div class="bonus-item"><div class="bonus-label">🎯 Meiste Assists <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-assists" placeholder="z.B. Musiala" /></div>
+        <div class="bonus-item"><div class="bonus-label">⭐ MVP (Bester Spieler) <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-mvp" placeholder="z.B. Bellingham" /></div>
+        <div class="bonus-item"><div class="bonus-label">💎 Bester Youngstar <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-youngstar" placeholder="z.B. Wirtz" /></div>
+        <div class="bonus-item" style="margin-bottom:0"><div class="bonus-label">🧤 Bester Keeper <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-keeper" placeholder="z.B. Neuer" /></div>
       </div>
       <button class="save-btn" onclick="saveBonus()">Bonus-Tipps speichern</button>
     </div>
@@ -206,9 +211,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore korrekt</div></div><div class="rule-pts" style="color:var(--green)">3</div></div>
         <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tordifferenz</div><div style="font-size:12px;color:var(--muted)">Differenz stimmt (z.B. Tipp 2:0, Ergebnis 4:2 oder Unentschieden)</div></div><div class="rule-pts" style="color:var(--blue)">2</div></div>
         <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Nur der Sieger ist korrekt</div></div><div class="rule-pts" style="color:var(--amber)">1</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Weltmeister</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Finalist</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Torschützenkönig</div><div style="font-size:12px;color:var(--muted)">Bonus-Tipp</div></div><div class="rule-pts">5</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Bonus-Fragen</div><div style="font-size:12px;color:var(--muted)">Je korrekter Bonus-Tipp (Weltmeister, MVP, etc.)</div></div><div class="rule-pts">5</div></div>
       </div>
       <div class="card">
         <div class="card-title">Automatische Ergebnisse</div>
@@ -268,7 +271,6 @@ window.addEventListener('DOMContentLoaded', async()=>{
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
     
-    // Initialisiere die Desktop-Scroll-Gesten
     initDesktopScroll();
   } catch(e) {
     document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#b52a2a">Fehler beim Starten: '+e.message+'</div>';
@@ -332,12 +334,18 @@ async function loadMyTipps(){
   myTipps={};
   (data||[]).forEach(t=>{myTipps[t.match_id]={h:t.home_score,a:t.away_score};});
 }
+
 async function loadBonus(){
   const {data}=await sb.from('bonus_tipps').select('*').eq('player_id',player.id).single();
   if(data){
     document.getElementById('b-wm').value=data.weltmeister||'';
     document.getElementById('b-finalist').value=data.finalist||'';
+    document.getElementById('b-dritter').value=data.dritter_platz||'';
     document.getElementById('b-tore').value=data.torschuetze||'';
+    document.getElementById('b-assists').value=data.assists||'';
+    document.getElementById('b-mvp').value=data.mvp||'';
+    document.getElementById('b-youngstar').value=data.youngstar||'';
+    document.getElementById('b-keeper').value=data.keeper||'';
   }
 }
 
@@ -390,7 +398,7 @@ function switchTab(key){
   renderCurrentGroup();
 }
 
-// ── FIX: Desktop Click & Drag + Mausrad für die gtabs Leiste ──
+// ── Desktop Click & Drag + Mausrad für die gtabs Leiste ──────
 function initDesktopScroll() {
   const gtabs = document.getElementById('gtabs');
   if(!gtabs) return;
@@ -400,13 +408,11 @@ function initDesktopScroll() {
   let scrollLeft;
   let hasDragged = false;
 
-  // 1. Mausrad-Support (Vertikal-Scrollen in Horizontal-Scrollen umwandeln)
   gtabs.addEventListener('wheel', (e) => {
     e.preventDefault();
-    gtabs.scrollLeft += e.deltaY * 1.5; // Multiplikator steuert Scroll-Geschwindigkeit
+    gtabs.scrollLeft += e.deltaY * 1.5;
   }, { passive: false });
 
-  // 2. Click & Drag Support (Ziehen mit gedrückter Maustaste)
   gtabs.addEventListener('mousedown', (e) => {
     isDown = true;
     hasDragged = false;
@@ -414,26 +420,20 @@ function initDesktopScroll() {
     scrollLeft = gtabs.scrollLeft;
   });
 
-  gtabs.addEventListener('mouseleave', () => {
-    isDown = false;
-  });
-
-  gtabs.addEventListener('mouseup', () => {
-    isDown = false;
-  });
+  gtabs.addEventListener('mouseleave', () => { isDown = false; });
+  gtabs.addEventListener('mouseup', () => { isDown = false; });
 
   gtabs.addEventListener('mousemove', (e) => {
     if(!isDown) return;
     e.preventDefault();
     const x = e.pageX - gtabs.offsetLeft;
-    const walk = (x - startX) * 1.5; // Multiplikator steuert Drag-Geschwindigkeit
+    const walk = (x - startX) * 1.5;
     gtabs.scrollLeft = scrollLeft - walk;
     if(Math.abs(walk) > 5) {
       hasDragged = true;
     }
   });
 
-  // Verhindert, dass das Loslassen nach einem Drag als Button-Klick gewertet wird
   gtabs.addEventListener('click', (e) => {
     if (hasDragged) {
       e.preventDefault();
@@ -537,12 +537,18 @@ async function saveTipps(){
   renderHome();
   toast(`✓ ${upserts.length} Tipps gespeichert!`);
 }
+
 async function saveBonus(){
   const d={
     player_id:player.id,
-    weltmeister:document.getElementById('b-wm').value,
-    finalist:document.getElementById('b-finalist').value,
-    torschuetze:document.getElementById('b-tore').value,
+    weltmeister:document.getElementById('b-wm').value.trim(),
+    finalist:document.getElementById('b-finalist').value.trim(),
+    dritter_platz:document.getElementById('b-dritter').value.trim(),
+    torschuetze:document.getElementById('b-tore').value.trim(),
+    assists:document.getElementById('b-assists').value.trim(),
+    mvp:document.getElementById('b-mvp').value.trim(),
+    youngstar:document.getElementById('b-youngstar').value.trim(),
+    keeper:document.getElementById('b-keeper').value.trim(),
     updated_at:new Date().toISOString()
   };
   const {error}=await sb.from('bonus_tipps').upsert(d,{onConflict:'player_id'});
