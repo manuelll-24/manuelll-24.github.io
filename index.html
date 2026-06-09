@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>⚽ WM 2026 Tippspiel</title>
+<title>WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -50,7 +50,8 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
 .btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
-.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none}
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.gtabs:active{cursor:grabbing}
 .gtabs::-webkit-scrollbar{display:none}
 .gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:500}
 .gtab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
@@ -276,9 +277,37 @@ function isTippLocked(match) {
   return new Date() >= new Date(match.kickoff_utc);
 }
 
+function initDragScroll() {
+  const slider = document.getElementById('gtabs');
+  if(!slider) return;
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  slider.addEventListener('mousedown', (e) => {
+    isDown = true;
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+  });
+  slider.addEventListener('mouseleave', () => {
+    isDown = false;
+  });
+  slider.addEventListener('mouseup', () => {
+    isDown = false;
+  });
+  slider.addEventListener('mousemove', (e) => {
+    if(!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    slider.scrollLeft = scrollLeft - walk;
+  });
+}
+
 window.addEventListener('DOMContentLoaded', async()=>{
   try {
     sb = supabase.createClient(SB_URL, SB_KEY);
+    initDragScroll();
     const saved = localStorage.getItem('wm2026_player');
     if(saved){ player=JSON.parse(saved); await startApp(); }
     else show('login-screen');
