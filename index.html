@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>⚽ WM 2026 Tippspiel</title>
+<title>WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -595,30 +595,55 @@ function autosaveBonusField(col, val){
 }
 
 async function loadRanking(){
-  // Ranglisten-View direkt abfragen
-  const {data:ranks}=await sb.from('rangliste').select('*');
+  // Alle Tipps aller Spieler + abgeschlossene UND laufende Spiele laden
+  const [{data:allTipps},{data:players}]=await Promise.all([
+    sb.from('tipps').select('*'),
+    sb.from('players').select('*'),
+  ]);
+
+  const hasLive=dbMatches.some(m=>['1H','HT','2H','ET','PEN'].includes(m.status));
+
+  // Punkteberechnung pro Spieler (FT + Live)
+  const ranked=(players||[]).map(p=>{
+    const ptipps=(allTipps||[]).filter(t=>t.player_id===p.id);
+    let pts=0,exact=0,diff=0,tend=0;
+    ptipps.forEach(t=>{
+      const m=dbMatches.find(x=>x.match_id===t.match_id);
+      if(!m||!['FT','1H','HT','2H','ET','PEN'].includes(m.status)) return;
+      if(m.home_score===null||m.away_score===null) return;
+      if(t.home_score===null||t.away_score===null) return;
+      const r=calcPts({h:t.home_score,a:t.away_score},{h:m.home_score,a:m.away_score});
+      if(r===3){pts+=3;exact++;}
+      else if(r===2){pts+=2;diff++;}
+      else if(r===1){pts+=1;tend++;}
+    });
+    return{nick:p.nick,pts,exact,diff,tend};
+  }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.diff-a.diff);
+
   const finished=dbMatches.filter(m=>m.status==='FT').length;
-  const me=ranks?.find(r=>r.nick===player.nick);
+  const me=ranked.find(r=>r.nick===player.nick);
   if(me){
-    document.getElementById('st-pts').textContent=me.punkte||0;
-    document.getElementById('st-exact').textContent=me.exakt||0;
-    document.getElementById('st-tend').textContent=me.tendenz||0;
+    document.getElementById('st-pts').textContent=me.pts;
+    document.getElementById('st-exact').textContent=me.exact;
+    document.getElementById('st-tend').textContent=me.tend;
     document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
     document.getElementById('my-stats').style.display='block';
   }
+
   const medals=['🥇','🥈','🥉'];
-  document.getElementById('ranking-list').innerHTML=(ranks||[]).map((p,i)=>{
+  const liveNote=hasLive?'<div style="font-size:11px;color:var(--red);margin-bottom:8px"><span class="live-dot"></span>Vorläufiger Stand – Spiel läuft</div>':'';
+  document.getElementById('ranking-list').innerHTML=liveNote+(ranked||[]).map((p,i)=>{
     const isMe=p.nick===player.nick;
     const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
     return `<div class="rank-row ${isMe?'me':''}">
       ${pos}
       <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
       <div>
-        <div class="rank-pts-val">${p.punkte||0}</div>
-        <div class="rank-pts-sub">${p.exakt||0}✓ ${p.tendenz||0}~</div>
+        <div class="rank-pts-val">${p.pts}${hasLive?'<span style="font-size:11px;color:var(--hint)"> ~</span>':''}</div>
+        <div class="rank-pts-sub">${p.exact}✓ ${p.diff?p.diff+'± ':''}${p.tend}~</div>
       </div>
     </div>`;
-  }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele beendet</div>';
+  }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele gestartet</div>';
 }
 
 // ── RESULTS ───────────────────────────────────────────────────
