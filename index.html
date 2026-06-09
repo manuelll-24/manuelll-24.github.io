@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -95,9 +95,13 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .rule-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .rule-row:last-child{border-bottom:none}
 .rule-pts{font-size:20px;font-weight:800;color:var(--blue)}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-.stat-box{background:var(--surface2);border-radius:var(--r-md);padding:10px;text-align:center}
-.stat-val{font-size:22px;font-weight:800}.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* OPTIMIERT: 4-Spalten-Grid für die obere Statistikbox */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:12px}
+.stat-box{background:var(--surface2);border-radius:var(--r-md);padding:8px 2px;text-align:center}
+.stat-val{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap}
+
 .progress-bar{height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
 .progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .5s}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;display:inline-block;margin-right:4px}
@@ -196,8 +200,9 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="card-title">Meine Statistik</div>
         <div class="stat-grid">
           <div class="stat-box"><div class="stat-val" id="st-pts">0</div><div class="stat-lbl">Punkte</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-exact">0</div><div class="stat-lbl">Exakt</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-tend">0</div><div class="stat-lbl">Tendenz</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-exact">0</div><div class="stat-lbl">Exakt (3P)</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-diff">0</div><div class="stat-lbl">Diff. (2P)</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-tend">0</div><div class="stat-lbl">Tendenz (1P)</div></div>
         </div>
         <div style="font-size:12px;color:var(--muted)">Turnierfortschritt</div>
         <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
@@ -284,22 +289,28 @@ function initDragScroll() {
   let startX;
   let scrollLeft;
 
-  slider.addEventListener('mousedown', (e) => {
+  slider.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse') return;
     isDown = true;
+    slider.setPointerCapture(e.pointerId);
     startX = e.pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
-  slider.addEventListener('mouseleave', () => {
+
+  slider.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') return;
     isDown = false;
   });
-  slider.addEventListener('mouseup', () => {
+
+  slider.addEventListener('pointercancel', () => {
     isDown = false;
   });
-  slider.addEventListener('mousemove', (e) => {
-    if(!isDown) return;
+
+  slider.addEventListener('pointermove', (e) => {
+    if(!isDown || e.pointerType !== 'mouse') return;
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
-    const walk = (x - startX) * 1.5;
+    const walk = (x - startX) * 2;
     slider.scrollLeft = scrollLeft - walk;
   });
 }
@@ -462,7 +473,6 @@ function renderMatchRow(m, prefix='tipps'){
   const isDone=m.status==='FT';
   const hasScore=m.home_score!==null&&m.away_score!==null;
 
-  // MODIFIKATION: Punkteberechnung auch bei Live-Spielen erlaubt
   const pts=(isDone||isLive)&&hasScore?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
 
   let dateStr='';
@@ -476,7 +486,6 @@ function renderMatchRow(m, prefix='tipps'){
     ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
     : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
 
-  // MODIFIKATION: Chip-Anzeige auch bei Live-Spielen erlaubt
   const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
     :pts===2?`<span class="chip chip-2">+2</span>`
     :pts===1?`<span class="chip chip-1">+1</span>`
@@ -545,7 +554,6 @@ async function saveTipps(){
   toast(`✓ ${upserts.length} Tipps gespeichert!`);
 }
 
-
 async function autosaveMatchTipp(matchId, prefix){
   const mid=parseInt(matchId,10);
   const match=dbMatches.find(m=>m.match_id===mid);
@@ -609,9 +617,11 @@ async function loadRanking(){
 
   const finished=dbMatches.filter(m=>m.status==='FT').length;
   const me=ranked.find(r=>r.nick===player.nick);
+
   if(me){
     document.getElementById('st-pts').textContent=me.pts;
     document.getElementById('st-exact').textContent=me.exact;
+    document.getElementById('st-diff').textContent=me.diff;
     document.getElementById('st-tend').textContent=me.tend;
     document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
     document.getElementById('my-stats').style.display='block';
@@ -627,7 +637,7 @@ async function loadRanking(){
       <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
       <div>
         <div class="rank-pts-val">${p.pts}${hasLive?'<span style="font-size:11px;color:var(--hint)"> ~</span>':''}</div>
-        <div class="rank-pts-sub">${p.exact}✓ ${p.diff?p.diff+'± ':''}${p.tend}~</div>
+        <div class="rank-pts-sub">${p.exact}✓ ${p.diff}± ${p.tend}~</div>
       </div>
     </div>`;
   }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele gestartet</div>';
@@ -698,8 +708,7 @@ function renderHome(){
     upEmpty.style.display='block';
   } else {
     upEmpty.style.display='none';
-    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>'
-      ;
+    upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>';
   }
 }
 
