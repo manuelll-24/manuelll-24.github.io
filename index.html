@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>⚽ WM 2026 Tippspiel</title>
+<title>WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -578,6 +578,21 @@ async function autosaveMatchTipp(matchId, prefix){
   },{onConflict:'player_id,match_id'});
   if(error) console.error('Autosave Fehler:',error.message);
 }
+
+// Debounce-Timer für Bonus – speichert 800ms nach letztem Tastendruck
+let bonusTimer=null;
+function autosaveBonusField(col, val){
+  clearTimeout(bonusTimer);
+  bonusTimer=setTimeout(async()=>{
+    const {error}=await sb.from('bonus_tipps').upsert({
+      player_id:player.id,
+      [col]:val.trim(),
+      updated_at:new Date().toISOString()
+    },{onConflict:'player_id'});
+    if(error) console.error('Bonus Fehler:',error.message);
+  },800);
+}
+
 async function loadRanking(){
   // Ranglisten-View direkt abfragen
   const {data:ranks}=await sb.from('rangliste').select('*');
