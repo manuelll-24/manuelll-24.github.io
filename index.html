@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WM 2026 Tippspiel</title>
+<title>⚽ WM 2026 Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -483,6 +483,7 @@ function renderMatchRow(m, prefix='tipps'){
     ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}` +`</span>`
     : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
   const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`
+    :pts===2?`<span class="chip chip-2">+2</span>`
     :pts===1?`<span class="chip chip-1">+1</span>`
     :pts===0&&isDone?`<span class="chip chip-0">+0</span>`:'';
 
@@ -637,6 +638,7 @@ function renderResults(){
     const isLive=['1H','HT','2H','ET','PEN'].includes(m.status);
     const pts=isDone&&tip?calcPts(tip,{h:m.home_score,a:m.away_score}):null;
     const ptsHtml=pts===3?`<span class="chip chip-3">+3</span>`
+      :pts===2?`<span class="chip chip-2">+2</span>`
       :pts===1?`<span class="chip chip-1">+1</span>`
       :pts===0?`<span class="chip chip-0">+0</span>`
       :`<span style="font-size:11px;color:var(--hint)">—</span>`;
@@ -736,7 +738,7 @@ function renderHome(){
   } else {
     upEmpty.style.display='none';
     upEl.innerHTML='<div class="card" style="padding:0 16px">'+upcoming.map(m=>renderMatchRow(m,'home')).join('')+'</div>'
-      +'<button class="save-btn" onclick="saveHomeTipps()">Tipps speichern</button>';
+      ;
   }
 }
 
