@@ -82,7 +82,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .save-btn{width:100%;padding:14px;border-radius:var(--r-lg);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:all .15s;margin-top:12px}
 .save-btn:active{transform:scale(.98);opacity:.88}
 
-/* Styling für die farbige Rangliste */
 .rank-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border);position:relative;margin:0 -4px;padding-left:14px}
 .rank-row:last-child{border-bottom:none}
 .rank-color-bar{position:absolute;left:4px;top:10px;bottom:10px;width:4px;border-radius:2px;flex-shrink:0}
@@ -136,8 +135,8 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
   <div class="app">
     <div class="header">
       <div>
-        <h1>WM 2026 Tippspiel</h1>
-        <div class="header-sub" id="hdr-sub"> </div>
+        <h1>⚽ WM 2026 Tippspiel</h1>
+        <div class="header-sub" id="hdr-sub"></div>
       </div>
       <div class="user-pill" onclick="toggleUserMenu()" style="cursor:pointer;position:relative">
         <div class="avatar" id="hdr-av">?</div>
@@ -255,9 +254,8 @@ function isTippLocked(match) {
   return new Date() >= new Date(match.kickoff_utc);
 }
 
-// Hilfsfunktion: Wandelt einen HEX-Code in eine transparente RGBA-Farbe um (für den Highlight-Hintergrund)
 function hexToRgba(hex, alpha) {
-  if(!hex) return `rgba(26, 95, 168, ${alpha})`; // Fallback Blau
+  if(!hex) return `rgba(26, 95, 168, ${alpha})`;
   hex = hex.replace('#', '');
   if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
   const r = parseInt(hex.substring(0,2), 16) || 26;
@@ -266,29 +264,49 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// KORRIGIERTE DRAG-SCROLL FUNKTION: Erlaubt normales Klicken am PC ohne Blockieren
 function initDragScroll() {
   const slider = document.getElementById('gtabs');
   if(!slider) return;
   let isDown = false;
   let startX;
   let scrollLeft;
+  let dragMoved = false;
 
   slider.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse') return;
     isDown = true;
-    slider.setPointerCapture(e.pointerId);
     startX = e.pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
+    dragMoved = false;
   });
-  slider.addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') isDown = false; });
-  slider.addEventListener('pointercancel', () => { isDown = false; });
+
+  slider.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'mouse') isDown = false;
+  });
+
+  slider.addEventListener('pointerleave', () => {
+    isDown = false;
+  });
+
   slider.addEventListener('pointermove', (e) => {
     if(!isDown || e.pointerType !== 'mouse') return;
-    e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const walk = (x - startX) * 2;
+    // Wenn die Maus mehr als 4 Pixel bewegt wurde, gilt es als Ziehen (Scrollen)
+    if (Math.abs(x - startX) > 4) {
+      dragMoved = true;
+    }
     slider.scrollLeft = scrollLeft - walk;
   });
+
+  // Verhindert das Auslösen des Klicks auf den Buttons NUR dann, wenn tatsächlich gescrollt wurde
+  slider.addEventListener('click', (e) => {
+    if (dragMoved) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
 }
 
 window.addEventListener('DOMContentLoaded', async()=>{
@@ -336,7 +354,6 @@ async function startApp(){
   show('main-app');
   document.getElementById('hdr-nick').textContent=player.nick;
   document.getElementById('hdr-av').textContent=player.nick.charAt(0).toUpperCase();
-  // Färbe den Avatar oben rechts auch in der Spieler-Farbe ein (Fallback Blau)
   if (player.color) {
     document.getElementById('hdr-av').style.background = player.color;
     document.getElementById('hdr-av').style.color = '#fff';
@@ -498,7 +515,6 @@ function autosaveBonusField(col, val){
 }
 
 async function loadRanking(){
-  // Holt nun auch die neue "color" Spalte aus der Datenbank
   const [{data:allTipps},{data:players}]=await Promise.all([sb.from('tipps').select('*'), sb.from('players').select('*')]);
   const hasLive=dbMatches.some(m=>['1H','HT','2H','ET','PEN'].includes(m.status));
 
@@ -513,7 +529,6 @@ async function loadRanking(){
       else if(r===2){pts+=2;diff++;}
       else if(r===1){pts+=1;tend++;}
     });
-    // Übergibt auch p.color an das Ranked-Array
     return{nick:p.nick, color:p.color, pts,exact,diff,tend};
   }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.diff-a.diff);
 
@@ -535,11 +550,7 @@ async function loadRanking(){
   document.getElementById('ranking-list').innerHTML=liveNote+(ranked||[]).map((p,i)=>{
     const isMe=p.nick===player.nick;
     const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
-
-    // Nutzt die Farbe aus der DB (p.color) - oder als Fallback ein schönes Blau (#1a5fa8)
     const playerColor = p.color || '#1a5fa8';
-
-    // Eigener Tab erhält einen dezent transparenten Hintergrund mit der eigenen Farbe aus der DB
     const inlineBg = isMe ? ` style="background: ${hexToRgba(playerColor, 0.12)}"` : '';
 
     return `<div class="rank-row ${isMe?'me':''}"${inlineBg}>
