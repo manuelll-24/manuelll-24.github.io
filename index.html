@@ -368,7 +368,6 @@ async function startApp(){
   },30000);
 }
 
-// ANGEPASST: Fügt home_scorers und away_scorers der select-Abfrage hinzu
 async function loadMatches(){
   const {data,error}=await sb.from('matches').select('match_id,home_team,away_team,flag_home,flag_away,kickoff_utc,stage,group_name,match_day,status,home_score,away_score,minute,home_scorers,away_scorers').order('kickoff_utc');
   if(!error&&data) dbMatches=data;
@@ -452,6 +451,12 @@ function renderCurrentGroup(){
   if(document.getElementById('sec-home').classList.contains('active')) renderHome();
 }
 
+// Hilfsfunktion zum Aufsplitten der Torschützen
+function formatScorers(str) {
+  if(!str) return '';
+  return str.split(',').map(s => s.trim() + '').join('<br>');
+}
+
 function renderMatchRow(m, prefix='tipps'){
   const locked=isTippLocked(m);
   const tip=myTipps[m.match_id]||{h:'',a:''};
@@ -477,7 +482,6 @@ function renderMatchRow(m, prefix='tipps'){
        <input class="score-in" type="number" min="0" max="20" value="${tip.a!==''&&tip.a!=null?tip.a:''}" id="${prefix}_${m.match_id}_a" oninput="autosaveMatchTipp(${m.match_id},'${prefix}')" placeholder="–"${locked?' disabled':''}>
      </div>`;
 
-  // ANGEPASST: Render-Logik für Torschützen (nur wenn Daten vorhanden sind)
   return `<div class="match-item">
     <div class="match-top"><span class="match-date">${dateStr}</span><div style="display:flex;gap:5px;align-items:center">${statusChip}${ptsChip}</div></div>
     <div class="match-teams">
@@ -485,7 +489,11 @@ function renderMatchRow(m, prefix='tipps'){
       ${scoreHtml}
       <div class="team-cell away">${m.flag_away?`<span class="team-flag">${m.flag_away}</span>`:''}<span class="team-name">${m.away_team}</span></div>
     </div>
-    ${(m.home_scorers || m.away_scorers) ? `<div style="display:grid;grid-template-columns:1fr 90px 1fr;gap:6px;margin-top:3px"><div style="text-align:right;font-size:10.5px;color:var(--hint);line-height:1.35">${m.home_scorers ? m.home_scorers + '' : ''}</div><div></div><div style="text-align:left;font-size:10.5px;color:var(--hint);line-height:1.35">${m.away_scorers ? '' + m.away_scorers : ''}</div></div>` : ''}
+    ${(m.home_scorers || m.away_scorers) ? `<div style="display:grid;grid-template-columns:1fr 90px 1fr;gap:6px;margin-top:8px">
+      <div style="text-align:right;font-size:11px;color:var(--hint);line-height:1.5">${formatScorers(m.home_scorers)}</div>
+      <div></div>
+      <div style="text-align:left;font-size:11px;color:var(--hint);line-height:1.5">${m.away_scorers ? m.away_scorers.split(',').map(s => '' + s.trim()).join('<br>') : ''}</div>
+    </div>` : ''}
     ${(isLive||isDone)&&tip.h!==''&&tip.h!=null?`<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:6px">Dein Tipp: ${tip.h}:${tip.a}</div>`:''}
   </div>`;
 }
