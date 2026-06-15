@@ -72,17 +72,19 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .score-in:focus{outline:none;border-color:var(--blue)}
 .score-sep{font-size:15px;font-weight:700;color:var(--muted)}
 .live-result{background:var(--text);color:var(--bg);border-radius:8px;padding:4px 10px;font-size:17px;font-weight:800;text-align:center;min-width:52px}
+
 .chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
 .chip-3{background:var(--green-bg);color:var(--green)}
-.chip-1{background:var(--amber-bg);color:var(--amber)}
 .chip-2{background:var(--blue-bg);color:var(--blue)}
+.chip-1{background:var(--amber-bg);color:var(--amber)}
 .chip-0{background:var(--surface2);color:var(--hint)}
 .chip-live{background:var(--red-bg);color:var(--red)}
 .chip-done{background:var(--surface2);color:var(--muted)}
+
 .save-btn{width:100%;padding:14px;border-radius:var(--r-lg);border:none;background:var(--text);color:var(--bg);font-size:15px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:all .15s;margin-top:12px}
 .save-btn:active{transform:scale(.98);opacity:.88}
 
-.rank-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border);position:relative;margin:0 -4px;padding-left:14px}
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border);position:relative;margin:0 -4px;padding-left:14px;transition:box-shadow 0.2s ease}
 .rank-row:last-child{border-bottom:none}
 .rank-color-bar{position:absolute;left:4px;top:10px;bottom:10px;width:4px;border-radius:2px;flex-shrink:0}
 .rank-pos{width:24px;font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
@@ -90,7 +92,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .rank-name small{font-size:11px;color:var(--hint);font-weight:400;margin-left:4px}
 .rank-pts-val{font-size:17px;font-weight:800;text-align:right}
 .rank-pts-sub{font-size:11px;color:var(--muted);text-align:right}
-.rank-row.me{border-radius:var(--r-md)}
+.rank-row.me{border-radius:var(--r-md);z-index:1}
 
 .bonus-item{margin-bottom:14px}
 .bonus-label{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -195,9 +197,9 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
         <div class="card-title">Meine Statistik</div>
         <div class="stat-grid">
           <div class="stat-box"><div class="stat-val" id="st-pts">0</div><div class="stat-lbl">Punkte</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-exact">0</div><div class="stat-lbl">Exakt (3P)</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-diff">0</div><div class="stat-lbl">Diff. (2P)</div></div>
-          <div class="stat-box"><div class="stat-val" id="st-tend">0</div><div class="stat-lbl">Tendenz (1P)</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-exact">0</div><div class="stat-lbl">Exakt (4P)</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-diff">0</div><div class="stat-lbl">Diff. (3P)</div></div>
+          <div class="stat-box"><div class="stat-val" id="st-tend">0</div><div class="stat-lbl">Tendenz (2P)</div></div>
         </div>
         <div style="font-size:12px;color:var(--muted)">Turnierfortschritt</div>
         <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
@@ -211,9 +213,9 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section" id="sec-regeln">
       <div class="card">
         <div class="card-title">Spieltipps – Punktesystem</div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore genau richtig</div></div><div class="rule-pts" style="color:var(--green)">3</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tordifferenz</div><div style="font-size:12px;color:var(--muted)">z.B. Tipp 2:0 – Ergebnis 3:1 (beide +2)</div></div><div class="rule-pts" style="color:var(--blue)">2</div></div>
-        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden richtig</div></div><div class="rule-pts" style="color:var(--amber)">1</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Exaktes Ergebnis</div><div style="font-size:12px;color:var(--muted)">Beide Tore genau richtig</div></div><div class="rule-pts" style="color:var(--green)">4</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tordifferenz</div><div style="font-size:12px;color:var(--muted)">z.B. Tipp 2:0 – Ergebnis 3:1</div></div><div class="rule-pts" style="color:var(--blue)">3</div></div>
+        <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Richtige Tendenz</div><div style="font-size:12px;color:var(--muted)">Sieger oder Unentschieden richtig</div></div><div class="rule-pts" style="color:var(--amber)">2</div></div>
         <div class="rule-row"><div><div style="font-size:14px;font-weight:600">Falsch oder kein Tipp</div><div style="font-size:12px;color:var(--muted)">Tendenz falsch</div></div><div class="rule-pts" style="color:var(--hint);font-size:16px">0</div></div>
       </div>
     </div>
@@ -275,7 +277,7 @@ function initDragScroll() {
   slider.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'mouse') return;
     isDown = true;
-    slider.setPointerCapture(e.pointerId);
+    // setPointerCapture entfernt, damit Klicks auf die Unterelemente nicht blockiert werden
     startX = e.pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
     dragMoved = false;
@@ -365,6 +367,7 @@ async function startApp(){
     await loadMatches();
     renderCurrentGroup();
     renderHome();
+    if(document.getElementById('sec-rangliste').classList.contains('active')) loadRanking();
   },30000);
 }
 
@@ -451,7 +454,6 @@ function renderCurrentGroup(){
   if(document.getElementById('sec-home').classList.contains('active')) renderHome();
 }
 
-// Hilfsfunktion zum Aufsplitten der Torschützen
 function formatScorers(str) {
   if(!str) return '';
   return str.split(',').map(s => s.trim() + '').join('<br>');
@@ -472,7 +474,7 @@ function renderMatchRow(m, prefix='tipps'){
   }
 
   const statusChip=isLive ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE ${m.minute?m.minute+"'":''}</span>` : isDone ? `<span class="chip chip-done">Abgepfiffen</span>` : '';
-  const ptsChip=pts===3?`<span class="chip chip-3">+3</span>`:pts===2?`<span class="chip chip-2">+2</span>`:pts===1?`<span class="chip chip-1">+1</span>`:pts===0&&(isDone||isLive)?`<span class="chip chip-0">+0</span>`:'';
+  const ptsChip=pts===4?`<span class="chip chip-3">+4</span>`:pts===3?`<span class="chip chip-2">+3</span>`:pts===2?`<span class="chip chip-1">+2</span>`:pts===0&&(isDone||isLive)?`<span class="chip chip-0">+0</span>`:'';
 
   const scoreHtml=(isLive||isDone)&&hasScore
     ?`<div class="live-result">${m.home_score}&nbsp;:&nbsp;${m.away_score}</div>`
@@ -525,31 +527,35 @@ function autosaveBonusField(col, val){
 }
 
 async function loadRanking(){
-  const [{data:allTipps},{data:players}]=await Promise.all([sb.from('tipps').select('*'), sb.from('players').select('*')]);
+  const [{data: rankingData}, {data: playersData}] = await Promise.all([
+    sb.from('rangliste').select('*'),
+    sb.from('players').select('nick, color')
+  ]);
+
   const hasLive=dbMatches.some(m=>['1H','HT','2H','ET','PEN'].includes(m.status));
 
-  const ranked=(players||[]).map(p=>{
-    const ptipps=(allTipps||[]).filter(t=>t.player_id===p.id);
-    let pts=0,exact=0,diff=0,tend=0;
-    ptipps.forEach(t=>{
-      const m=dbMatches.find(x=>x.match_id===t.match_id);
-      if(!m||!['FT','1H','HT','2H','ET','PEN'].includes(m.status)||m.home_score===null||m.away_score===null||t.home_score===null||t.away_score===null) return;
-      const r=calcPts({h:t.home_score,a:t.away_score},{h:m.home_score,a:m.away_score});
-      if(r===3){pts+=3;exact++;}
-      else if(r===2){pts+=2;diff++;}
-      else if(r===1){pts+=1;tend++;}
-    });
-    return{nick:p.nick, color:p.color, pts,exact,diff,tend};
-  }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.diff-a.diff);
+  const playerColorMap = {};
+  (playersData || []).forEach(p => {
+    playerColorMap[p.nick] = p.color;
+  });
+
+  const ranked = (rankingData || []).map(r => ({
+    nick: r.nick,
+    punkte: r.punkte,
+    exakt: r.exakt,
+    differenz: r.differenz,
+    tendenz: r.tendenz,
+    color: r.color || playerColorMap[r.nick] || '#1a5fa8'
+  }));
 
   const finished=dbMatches.filter(m=>m.status==='FT').length;
   const me=ranked.find(r=>r.nick===player.nick);
 
   if(me){
-    document.getElementById('st-pts').textContent=me.pts;
-    document.getElementById('st-exact').textContent=me.exact;
-    document.getElementById('st-diff').textContent=me.diff;
-    document.getElementById('st-tend').textContent=me.tend;
+    document.getElementById('st-pts').textContent=me.punkte;
+    document.getElementById('st-exact').textContent=me.exakt;
+    document.getElementById('st-diff').textContent=me.differenz;
+    document.getElementById('st-tend').textContent=me.tendenz;
     document.getElementById('prog-fill').style.width=Math.round(finished/104*100)+'%';
     document.getElementById('my-stats').style.display='block';
   }
@@ -560,16 +566,19 @@ async function loadRanking(){
   document.getElementById('ranking-list').innerHTML=liveNote+(ranked||[]).map((p,i)=>{
     const isMe=p.nick===player.nick;
     const pos=i<3?`<span style="font-size:18px">${medals[i]}</span>`:`<span class="rank-pos">${i+1}</span>`;
-    const playerColor = p.color || '#1a5fa8';
-    const inlineBg = isMe ? ` style="background: ${hexToRgba(playerColor, 0.12)}"` : '';
+    const playerColor = p.color;
 
-    return `<div class="rank-row ${isMe?'me':''}"${inlineBg}>
+    const inlineStyle = isMe
+      ? ` style="background: ${hexToRgba(playerColor, 0.12)}; box-shadow: 0 0 12px ${hexToRgba(playerColor, 0.45)}; border: 1px solid ${hexToRgba(playerColor, 0.35)}"`
+      : '';
+
+    return `<div class="rank-row ${isMe?'me':''}"${inlineStyle}>
       <div class="rank-color-bar" style="background: ${playerColor}"></div>
       ${pos}
       <div class="rank-name">${p.nick}${isMe?' <small>(du)</small>':''}</div>
       <div>
-        <div class="rank-pts-val">${p.pts}${hasLive?'<span style="font-size:11px;color:var(--hint)"> ~</span>':''}</div>
-        <div class="rank-pts-sub">${p.exact}✓ ${p.diff}± ${p.tend}~</div>
+        <div class="rank-pts-val">${p.punkte}${hasLive?'<span style="font-size:11px;color:var(--hint)"> ~</span>':''}</div>
+        <div class="rank-pts-sub">${p.exakt}✓ ${p.differenz}± ${p.tendenz}~</div>
       </div>
     </div>`;
   }).join('')||'<div style="color:var(--muted);font-size:14px;padding:8px 0">Noch keine Spiele gestartet</div>';
@@ -578,9 +587,9 @@ async function loadRanking(){
 function calcPts(tip,res){
   if(tip.h===null||tip.h===undefined||tip.h==='')return null;
   const th=parseInt(tip.h),ta=parseInt(tip.a);
-  if(th===res.h&&ta===res.a)return 3;
-  if((th-ta)===(res.h-res.a))return 2;
-  if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a))return 1;
+  if(th===res.h&&ta===res.a)return 4;
+  if((th-ta)===(res.h-res.a))return 3;
+  if((th>ta&&res.h>res.a)||(th<ta&&res.h<res.a)||(th===ta&&res.h===res.a))return 2;
   return 0;
 }
 
