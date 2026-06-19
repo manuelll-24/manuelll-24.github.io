@@ -47,6 +47,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
 .input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:16px;transition:border-color .2s;outline:none}
 .input:focus{border-color:var(--blue)}
+.input:disabled{opacity:0.6;cursor:not-allowed}
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:600;transition:all .15s}
 .btn-primary{background:var(--text);color:var(--bg)}.btn-primary:active{opacity:.85;transform:scale(.98)}
 .btn-sm{width:auto;padding:7px 14px;font-size:13px;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-weight:500}
@@ -180,7 +181,7 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section" id="sec-bonus">
       <div class="card">
         <div class="card-title">Bonus-Tipps · je 5 Punkte</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Bis Gruppenphasenende änderbar</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px" id="bonus-info">Bis Gruppenphasenende änderbar</div>
         <div class="bonus-item"><div class="bonus-label">🏆 Weltmeister <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-wm" oninput="autosaveBonusField('weltmeister',this.value)" placeholder="z.B. Brasilien" /></div>
         <div class="bonus-item"><div class="bonus-label">🥈 Finalist <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-finalist" oninput="autosaveBonusField('finalist',this.value)" placeholder="z.B. Frankreich" /></div>
         <div class="bonus-item"><div class="bonus-label">🥉 3. Platz <span class="bonus-pts">+5 Pkt</span></div><input class="input" id="b-dritter" oninput="autosaveBonusField('dritter_platz',this.value)" placeholder="z.B. Deutschland" /></div>
@@ -250,6 +251,19 @@ let activeTab='A';
 let refreshTimer=null;
 
 const GROUP_KEYS=['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+function isBonusLocked() {
+  const deadline = new Date('2026-06-28T00:00:00+02:00');
+  return new Date() >= deadline;
+}
+
+function lockBonusInputs() {
+  if (!isBonusLocked()) return;
+  const inputs = document.querySelectorAll('#sec-bonus input');
+  inputs.forEach(input => input.disabled = true);
+  const info = document.getElementById('bonus-info');
+  if (info) info.innerHTML = '<span style="color:var(--red)">Gesperrt seit 28. Juni</span>';
+}
 
 function isTippLocked(match) {
   if(!match.kickoff_utc) return false;
@@ -360,6 +374,7 @@ async function startApp(){
   }
   document.getElementById('menu-nick').textContent=player.nick;
   await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+  lockBonusInputs();
   buildGroupTabs();
   renderCurrentGroup();
   renderHome();
@@ -520,6 +535,7 @@ async function autosaveMatchTipp(matchId, prefix){
 
 let bonusTimer=null;
 function autosaveBonusField(col, val){
+  if(isBonusLocked()) return; // Sicherheits-Check beim Tippen
   clearTimeout(bonusTimer);
   bonusTimer=setTimeout(async()=>{
     await sb.from('bonus_tipps').upsert({ player_id:player.id, [col]:val.trim(), updated_at:new Date().toISOString() },{onConflict:'player_id'});
