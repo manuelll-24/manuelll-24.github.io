@@ -19,7 +19,6 @@
   --r-md: 10px; --r-lg: 14px; --r-xl: 18px;
   --shadow: 0 1px 3px rgba(0,0,0,.08);
 
-  /* Competition Default Theme (Bundesliga Red) */
   --comp-primary: #d0021b;
   --comp-accent: #f5a623;
   --comp-bg-light: #fdeaea;
@@ -32,9 +31,9 @@ body[data-theme="dfb"] {
 }
 
 body[data-theme="cl"] {
-  --comp-primary: #001438;
-  --comp-accent: #00f0ff;
-  --comp-bg-light: #e4effe;
+  --comp-primary: #3350e0;
+  --comp-accent: #00d4ff;
+  --comp-bg-light: #e8edff;
 }
 
 @media(prefers-color-scheme:dark){
@@ -51,11 +50,10 @@ body[data-theme="cl"] {
 
 html{font-size:16px}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-text-size-adjust:100%}
-input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
+input,select,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 
 .app{max-width:480px;margin:0 auto;padding:0 0 80px}
 
-/* Header & Switcher */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:50;display:flex;flex-direction:column;gap:10px}
 .header-top{display:flex;align-items:center;justify-content:space-between}
 .header h1{font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--comp-primary);transition:color .3s}
@@ -78,14 +76,16 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
-.input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
-.input:focus{border-color:var(--comp-primary)}
+.input,.select{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-md);background:var(--surface2);color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
+.input:focus,.select:focus{border-color:var(--comp-primary)}
 
 .btn{width:100%;padding:13px;border-radius:var(--r-md);border:none;font-size:15px;font-weight:700;transition:all .15s}
 .btn-primary{background:var(--comp-primary);color:#fff}.btn-primary:active{opacity:.85;transform:scale(.98)}
 
-.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.gtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;cursor:grab;-webkit-overflow-scrolling:touch}
 .gtabs::-webkit-scrollbar{display:none}
+.gtabs.dragging{cursor:grabbing;user-select:none}
+.gtabs button{user-select:none}
 .gtab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--muted);font-size:13px;font-weight:600}
 .gtab.active{background:var(--comp-primary);color:#fff;border-color:var(--comp-primary)}
 
@@ -94,10 +94,12 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .match-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .match-date{font-size:11px;color:var(--hint)}
 .match-teams{display:grid;grid-template-columns:1fr 90px 1fr;align-items:center;gap:6px}
+
 .team-name{font-size:13px;font-weight:700;line-height:1.2}
-.team-cell{display:flex;flex-direction:column}
-.team-cell.home{align-items:flex-end;text-align:right}
-.team-cell.away{align-items:flex-start;text-align:left}
+.team-logo{width:22px;height:22px;object-fit:contain;flex-shrink:0;transition:opacity .2s;opacity:1}
+.team-cell{display:flex;flex-direction:row;align-items:center;gap:6px}
+.team-cell.home{justify-content:flex-end;text-align:right}
+.team-cell.away{justify-content:flex-start;text-align:left}
 
 .score-box{display:flex;align-items:center;justify-content:center;gap:5px}
 .score-in{width:36px;height:36px;text-align:center;font-size:17px;font-weight:800;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);padding:0}
@@ -115,7 +117,8 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .rank-pos{width:22px;font-size:14px;font-weight:800;text-align:center}
 .rank-name{flex:1;font-size:15px;font-weight:600}
 .rank-pts-val{font-size:17px;font-weight:800;text-align:right}
-.rank-row.me{background:var(--comp-bg-light);border-radius:var(--r-md);font-weight:700}
+.rank-row.me{font-weight:800;border-left:3px solid var(--comp-primary);padding-left:5px}
+.rank-row.me .rank-name::after{content:'Du';font-size:10px;font-weight:700;color:var(--comp-primary);background:transparent;border:1px solid var(--comp-primary);border-radius:8px;padding:1px 6px;margin-left:8px;vertical-align:middle}
 
 .bonus-item{margin-bottom:14px}
 .bonus-label{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
@@ -126,6 +129,19 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:14px;font-weight:600;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .loader{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+
+.score-in:disabled{opacity:.55;cursor:not-allowed;background:var(--surface2)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal-box{background:var(--surface);border-radius:var(--r-xl);padding:22px 20px;max-width:320px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px;transform:translateY(10px) scale(.97);transition:transform .18s}
+.modal-overlay.show .modal-box{transform:translateY(0) scale(1)}
+.modal-title{font-size:17px;font-weight:800}
+.modal-text{font-size:14px;color:var(--muted);line-height:1.4}
+.modal-actions{display:flex;gap:10px;margin-top:2px}
+.modal-actions .btn{width:auto;flex:1;padding:11px}
+.btn-secondary{background:var(--surface2);color:var(--text)}
+.btn-danger{background:var(--red);color:#fff}
 </style>
 </head>
 <body data-theme="bl1">
@@ -148,12 +164,12 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="header">
       <div class="header-top">
         <h1 id="app-title">Bundesliga Tippspiel</h1>
-        <div class="user-pill" onclick="confirmLogout()" style="cursor:pointer">
+        <div class="user-pill" onclick="openProfileModal()" style="cursor:pointer">
           <div class="avatar" id="hdr-av">?</div>
           <span id="hdr-nick">—</span>
         </div>
       </div>
-      <div class="comp-selector">
+      <div class="comp-selector" id="comp-selector">
         <button class="comp-btn active" id="btn-bl1" onclick="setCompetition('bl1')">Bundesliga</button>
         <button class="comp-btn" id="btn-dfb" onclick="setCompetition('dfb')">DFB-Pokal</button>
         <button class="comp-btn" id="btn-cl" onclick="setCompetition('cl')">Champions League</button>
@@ -164,6 +180,10 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section active" id="sec-home">
       <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:10px">LIVE & HEUTE</div>
       <div id="home-matches"><div class="loader">Lade Spiele…</div></div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:18px 0 10px">Nächste 24h</div>
+      <div id="home-upcoming"></div>
+      <div id="home-upcoming-empty" style="display:none;font-size:13px;color:var(--hint);padding:8px 0">Keine Spiele in den nächsten 24h</div>
     </div>
 
     <!-- TIPPS SECTION -->
@@ -177,7 +197,6 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <!-- BONUS SECTION -->
     <div class="section" id="sec-bonus">
       <div class="card" id="bonus-card-content">
-        <!-- Dynamische Boni Inhalte -->
       </div>
     </div>
 
@@ -209,8 +228,58 @@ input,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 
 <div class="toast" id="toast"></div>
 
+<!-- PROFILE / SETTINGS MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-box">
+    <div class="modal-title">Profil & Einstellungen</div>
+    <div class="modal-text">Angemeldet als <strong id="modal-nick"></strong></div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      <label style="font-size:12px;font-weight:700;color:var(--muted)">Lieblingsverein (Bundesliga)</label>
+      <select class="select" id="fav-team-select" onchange="updateFavoriteTeam(this.value)">
+        <option value="">-- Kein Verein gewählt --</option>
+        <option value="FC Bayern München">FC Bayern München</option>
+        <option value="Bayer 04 Leverkusen">Bayer 04 Leverkusen</option>
+        <option value="Borussia Dortmund">Borussia Dortmund</option>
+        <option value="RB Leipzig">RB Leipzig</option>
+        <option value="VfB Stuttgart">VfB Stuttgart</option>
+        <option value="Eintracht Frankfurt">Eintracht Frankfurt</option>
+        <option value="TSG 1899 Hoffenheim">TSG 1899 Hoffenheim</option>
+        <option value="1. FC Heidenheim 1846">1. FC Heidenheim 1846</option>
+        <option value="Werder Bremen">Werder Bremen</option>
+        <option value="SC Freiburg">SC Freiburg</option>
+        <option value="FC Augsburg">FC Augsburg</option>
+        <option value="VfL Wolfsburg">VfL Wolfsburg</option>
+        <option value="Mainz 05">Mainz 05</option>
+        <option value="Borussia Mönchengladbach">Borussia Mönchengladbach</option>
+        <option value="FC St. Pauli">FC St. Pauli</option>
+        <option value="Holstein Kiel">Holstein Kiel</option>
+        <option value="VfL Bochum">VfL Bochum</option>
+        <option value="1. FC Union Berlin">1. FC Union Berlin</option>
+      </select>
+      <div style="font-size:11px;color:var(--hint)">Hinweis: Spiele mit Beteiligung deines Lieblingsvereins können nicht getippt werden.</div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:10px">
+      <button class="btn btn-secondary" onclick="closeProfileModal()">Schließen</button>
+      <button class="btn btn-danger" onclick="confirmLogout()">Abmelden</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="modal-overlay" id="logout-modal">
+  <div class="modal-box">
+    <div class="modal-title">Abmelden?</div>
+    <div class="modal-text">Möchtest du dich wirklich abmelden? Deine Tipps bleiben gespeichert.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeLogoutModal()">Abbrechen</button>
+      <button class="btn btn-danger" onclick="doLogout()">Abmelden</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// SUPABASE ZUGANGSDATEN DEINES NEUEN PROJEKTS
 const SB_URL = 'https://rhjliwmewxxaeterinet.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJoamxpd21ld3h4YWV0ZXJpbmV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NTYxODUsImV4cCI6MjEwMzIzMjE4NX0.jKKbKtBPXnWSatqfGCOMtcA7ch-Jtd5vBx_4NEZga38';
 
@@ -246,12 +315,47 @@ const BONUS_CONFIGS = {
   ]
 };
 
+const matchTimers = {};
+const bonusTimers = {};
+
 window.addEventListener('DOMContentLoaded', async () => {
   sb = supabase.createClient(SB_URL, SB_KEY);
+  enableDragScroll(document.getElementById('gtabs'));
   const saved = localStorage.getItem('tipp_player');
   if(saved){ player = JSON.parse(saved); await startApp(); }
   else show('login-screen');
+
+  setInterval(async () => {
+    if(!player) return;
+    await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+
+    const active = document.activeElement;
+    const isTyping = active && (active.classList?.contains('score-in') || active.classList?.contains('input') || active.classList?.contains('select'));
+    if(!isTyping) {
+      renderCurrentMatchday();
+      renderBonusSection();
+    }
+    renderHome();
+  }, 30000);
 });
+
+function enableDragScroll(el){
+  if(!el) return;
+  let isDown = false, startX = 0, startScroll = 0, moved = false;
+  el.addEventListener('mousedown', e => {
+    isDown = true; moved = false;
+    startX = e.pageX; startScroll = el.scrollLeft;
+    el.classList.add('dragging');
+  });
+  window.addEventListener('mouseup', () => { isDown = false; el.classList.remove('dragging'); });
+  el.addEventListener('mousemove', e => {
+    if(!isDown) return;
+    const dx = e.pageX - startX;
+    if(Math.abs(dx) > 4) moved = true;
+    el.scrollLeft = startScroll - dx;
+  });
+  el.addEventListener('click', e => { if(moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+}
 
 function show(id){
   document.getElementById('login-screen').style.display = id==='login-screen'?'block':'none';
@@ -261,7 +365,7 @@ function show(id){
 async function doLogin(){
   const nick = document.getElementById('nick-input').value.trim();
   if(!nick || nick.length < 2){ toast('Name zu kurz'); return; }
-  let { data: p } = await sb.from('players').select('*').eq('nick', nick).single();
+  let { data: p } = await sb.from('players').select('*').eq('nick', nick).maybeSingle();
   if(!p){
     const { data: np } = await sb.from('players').insert({ nick }).select().single();
     p = np;
@@ -271,25 +375,59 @@ async function doLogin(){
   await startApp();
 }
 
-function confirmLogout(){
-  if(confirm(`Als "${player?.nick || ''}" abmelden?`)) doLogout();
+function openProfileModal(){
+  document.getElementById('modal-nick').textContent = player?.nick || '';
+  document.getElementById('fav-team-select').value = player?.favorite_team || '';
+  document.getElementById('profile-modal').classList.add('show');
 }
 
+function closeProfileModal(){ document.getElementById('profile-modal').classList.remove('show'); }
+
+function confirmLogout(){
+  closeProfileModal();
+  document.getElementById('logout-modal').classList.add('show');
+}
+
+function closeLogoutModal(){ document.getElementById('logout-modal').classList.remove('show'); }
+
 function doLogout(){
+  closeLogoutModal();
   localStorage.removeItem('tipp_player');
-  player = null;
-  myTipps = {};
-  dbMatches = [];
+  player = null; myTipps = {}; dbMatches = [];
   document.getElementById('nick-input').value = '';
   show('login-screen');
+}
+
+async function updateFavoriteTeam(team){
+  const fav = team !== '' ? team : null;
+  player.favorite_team = fav;
+  localStorage.setItem('tipp_player', JSON.stringify(player));
+
+  const { error } = await sb.from('players').update({ favorite_team: fav }).eq('id', player.id);
+  if(error){
+    console.error('Fehler beim Speichern des Lieblingsvereins:', error);
+    toast('Fehler beim Speichern');
+  } else {
+    toast('Lieblingsverein aktualisiert');
+    renderCurrentMatchday();
+    renderHome();
+  }
 }
 
 async function startApp(){
   show('main-app');
   document.getElementById('hdr-nick').textContent = player.nick;
   document.getElementById('hdr-av').textContent = player.nick.charAt(0).toUpperCase();
-  await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+
+  renderBonusSection();
   setCompetition('bl1');
+
+  await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+
+  buildMatchdayTabs();
+  renderCurrentMatchday();
+  renderBonusSection();
+  renderHome();
 }
 
 function setCompetition(comp) {
@@ -314,13 +452,18 @@ async function loadMatches(){
 
 async function loadMyTipps(){
   const { data } = await sb.from('tipps').select('*').eq('player_id', player.id);
-  myTipps = {};
-  (data||[]).forEach(t => { myTipps[t.match_id] = { h: t.home_score, a: t.away_score }; });
+  (data||[]).forEach(t => {
+    myTipps[t.match_id] = { h: t.home_score, a: t.away_score };
+  });
 }
 
 async function loadBonus(){
-  const { data } = await sb.from('bonus_tipps').select('*').eq('player_id', player.id).single();
-  if(data) Object.assign(myTipps, data);
+  const { data } = await sb.from('bonus_tipps').select('*').eq('player_id', player.id).maybeSingle();
+  if(data) {
+    Object.keys(data).forEach(k => {
+      if(k !== 'player_id') myTipps[k] = data[k];
+    });
+  }
 }
 
 function buildMatchdayTabs(){
@@ -341,6 +484,72 @@ function switchMatchday(day){
   renderCurrentMatchday();
 }
 
+function renderMatchRow(m){
+  const tip = myTipps[m.match_id] || { h: '', a: '' };
+  const isDone = m.status === 'FT';
+  const isLive = m.status === 'live' || ['1H','HT','2H','ET','PEN'].includes(m.status);
+  const hasScore = (isDone || isLive) && m.home_score !== null && m.away_score !== null;
+
+  // Prüfung, ob das Lieblingsteam beteiligt ist
+  const isFavoriteMatch = player?.favorite_team && (m.home_team === player.favorite_team || m.away_team === player.favorite_team);
+
+  const locked = isFavoriteMatch || (m.kickoff_utc && new Date(m.kickoff_utc).getTime() <= Date.now()) || hasScore;
+
+  let pts = null;
+  if(hasScore && tip.h !== '' && tip.h !== null && tip.h !== undefined && tip.a !== '' && tip.a !== null && tip.a !== undefined) {
+      pts = calcPts(tip, { h: m.home_score, a: m.away_score });
+  }
+
+  const ptsChip = pts === 4 ? `<span class="chip chip-4">+4</span>` :
+                  pts === 3 ? `<span class="chip chip-3">+3</span>` :
+                  pts === 2 ? `<span class="chip chip-2">+2</span>` :
+                  pts === 0 ? `<span class="chip chip-0">+0</span>` : '';
+
+  const liveLabel = isLive ? `<span class="chip chip-live"><span class="live-dot"></span>LIVE</span> ` :
+                    isDone ? `<span class="chip chip-0">Beendet</span> ` :
+                    isFavoriteMatch ? `<span class="chip chip-0">⭐ Lieblingsteam</span> ` :
+                    (locked && !hasScore ? `<span class="chip chip-0">🔒 Gesperrt</span> ` : '');
+
+  const valH = (tip.h !== '' && tip.h !== null && tip.h !== undefined) ? tip.h : '';
+  const valA = (tip.a !== '' && tip.a !== null && tip.a !== undefined) ? tip.a : '';
+
+  let scoreHtml;
+  if(hasScore){
+    scoreHtml = `<div class="live-result">${m.home_score ?? '–'} : ${m.away_score ?? '–'}</div>`;
+  } else if(locked){
+    scoreHtml = `<div class="score-box">
+        <input class="score-in" type="number" disabled value="${valH}" placeholder="-">
+        <span>:</span>
+        <input class="score-in" type="number" disabled value="${valA}" placeholder="-">
+      </div>`;
+  } else {
+    scoreHtml = `<div class="score-box">
+        <input class="score-in" type="number" min="0" value="${valH}" id="m_${m.match_id}_h" oninput="saveTipp(${m.match_id})" placeholder="-">
+        <span>:</span>
+        <input class="score-in" type="number" min="0" value="${valA}" id="m_${m.match_id}_a" oninput="saveTipp(${m.match_id})" placeholder="-">
+      </div>`;
+  }
+
+  const homeLogo = m.home_logo ? `<img src="${m.home_logo}" class="team-logo" loading="lazy" decoding="async" onerror="this.style.display='none'" alt="">` : '';
+  const awayLogo = m.away_logo ? `<img src="${m.away_logo}" class="team-logo" loading="lazy" decoding="async" onerror="this.style.display='none'" alt="">` : '';
+
+  const userTipDisplay = (locked && valH !== '' && valA !== '')
+                         ? `<div style="text-align:center;font-size:11px;color:var(--hint);margin-top:8px;font-weight:600;">Dein Tipp: ${valH}:${valA}</div>` : '';
+
+  return `<div class="match-item">
+    <div class="match-top">
+      <span class="match-date">${liveLabel}${new Date(m.kickoff_utc).toLocaleString('de',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
+      ${ptsChip}
+    </div>
+    <div class="match-teams">
+      <div class="team-cell home"><span class="team-name">${m.home_team}</span>${homeLogo}</div>
+      ${scoreHtml}
+      <div class="team-cell away">${awayLogo}<span class="team-name">${m.away_team}</span></div>
+    </div>
+    ${userTipDisplay}
+  </div>`;
+}
+
 function renderCurrentMatchday(){
   const matches = dbMatches.filter(m => m.competition === currentComp && m.match_day === activeMatchDay);
   const el = document.getElementById('group-matches');
@@ -348,36 +557,28 @@ function renderCurrentMatchday(){
   el.innerHTML = matches.map(m => renderMatchRow(m)).join('');
 }
 
-function renderMatchRow(m){
-  const tip = myTipps[m.match_id] || { h: '', a: '' };
-  const isDone = m.status === 'FT';
-  const isLive = m.status === 'live';
-  const pts = (isDone || isLive) && m.home_score !== null ? calcPts(tip, { h: m.home_score, a: m.away_score }) : null;
+function saveTipp(mid){
+  const hElem = document.getElementById(`m_${mid}_h`);
+  const aElem = document.getElementById(`m_${mid}_a`);
+  if (!hElem || !aElem) return;
 
-  const ptsChip = pts === 4 ? `<span class="chip chip-4">+4 Exakt</span>` : pts === 3 ? `<span class="chip chip-3">+3 Diff</span>` : pts === 2 ? `<span class="chip chip-2">+2 Tend</span>` : pts === 0 ? `<span class="chip chip-0">+0</span>` : '';
-  const liveLabel = isLive ? `<span class="live-dot"></span>` : '';
+  const hVal = hElem.value.trim();
+  const aVal = aElem.value.trim();
 
-  return `<div class="match-item">
-    <div class="match-top"><span class="match-date">${liveLabel}${new Date(m.kickoff_utc).toLocaleString('de',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span>${ptsChip}</div>
-    <div class="match-teams">
-      <div class="team-cell home"><span class="team-name">${m.home_team}</span></div>
-      ${isDone || isLive ? `<div class="live-result">${m.home_score ?? '–'}:${m.away_score ?? '–'}</div>` :
-      `<div class="score-box">
-        <input class="score-in" type="number" min="0" value="${tip.h??''}" id="m_${m.match_id}_h" oninput="saveTipp(${m.match_id})" placeholder="-">
-        <span>:</span>
-        <input class="score-in" type="number" min="0" value="${tip.a??''}" id="m_${m.match_id}_a" oninput="saveTipp(${m.match_id})" placeholder="-">
-      </div>`}
-      <div class="team-cell away"><span class="team-name">${m.away_team}</span></div>
-    </div>
-  </div>`;
-}
+  const h = hVal !== '' ? parseInt(hVal, 10) : null;
+  const a = aVal !== '' ? parseInt(aVal, 10) : null;
 
-async function saveTipp(mid){
-  const h = parseInt(document.getElementById(`m_${mid}_h`).value);
-  const a = parseInt(document.getElementById(`m_${mid}_a`).value);
-  if(isNaN(h) || isNaN(a)) return;
   myTipps[mid] = { h, a };
-  await sb.from('tipps').upsert({ player_id: player.id, match_id: mid, home_score: h, away_score: a }, { onConflict: 'player_id,match_id' });
+
+  if (matchTimers[mid]) clearTimeout(matchTimers[mid]);
+
+  matchTimers[mid] = setTimeout(async () => {
+    const { error } = await sb.from('tipps').upsert(
+      { player_id: player.id, match_id: mid, home_score: h, away_score: a },
+      { onConflict: 'player_id,match_id' }
+    );
+    if (error) console.error('Tipp-Speicherfehler:', error);
+  }, 500);
 }
 
 function renderBonusSection(){
@@ -395,13 +596,23 @@ function renderBonusSection(){
   container.innerHTML = html;
 }
 
-let bonusTimer;
 function saveBonusField(col, val){
-  clearTimeout(bonusTimer);
-  bonusTimer = setTimeout(async () => {
-    myTipps[col] = val.trim();
-    await sb.from('bonus_tipps').upsert({ player_id: player.id, [col]: val.trim() }, { onConflict: 'player_id' });
-  }, 700);
+  const cleanVal = val.trim() !== '' ? val.trim() : null;
+  myTipps[col] = cleanVal;
+
+  if (bonusTimers[col]) clearTimeout(bonusTimers[col]);
+
+  bonusTimers[col] = setTimeout(async () => {
+    const { error } = await sb.from('bonus_tipps').upsert(
+      { player_id: player.id, [col]: cleanVal },
+      { onConflict: 'player_id' }
+    );
+
+    if (error) {
+      console.error('Bonus-Speicherfehler:', error);
+      toast('Fehler beim Speichern des Bonus!');
+    }
+  }, 500);
 }
 
 async function renderRanking(){
@@ -417,7 +628,7 @@ async function renderRanking(){
 }
 
 function calcPts(tip, res){
-  if(tip.h === '' || tip.h === null || tip.h === undefined) return null;
+  if(tip.h === '' || tip.h === null || tip.h === undefined || tip.a === '' || tip.a === null || tip.a === undefined) return null;
   if(tip.h === res.h && tip.a === res.a) return 4;
   if((tip.h - tip.a) === (res.h - res.a)) return 3;
   if((tip.h > tip.a && res.h > res.a) || (tip.h < tip.a && res.h < res.a) || (tip.h === tip.a && res.h === res.a)) return 2;
@@ -425,10 +636,42 @@ function calcPts(tip, res){
 }
 
 function renderHome(){
-  const active = dbMatches.filter(m => m.competition === currentComp && m.status === 'live');
+  const now = new Date();
+  const in24 = new Date(now.getTime() + 24*60*60*1000);
+
+  const active = dbMatches.filter(m => {
+    if (m.competition !== currentComp) return false;
+    if (m.status === 'live' || ['1H','HT','2H','ET','PEN'].includes(m.status)) return true;
+    if (m.status === 'FT' && m.kickoff_utc) {
+      const ko = new Date(m.kickoff_utc);
+      return now.toLocaleDateString('de') === ko.toLocaleDateString('de');
+    }
+    return false;
+  }).sort((a,b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc));
+
+  const upcoming = dbMatches.filter(m => {
+    if (m.competition !== currentComp) return false;
+    if (!m.kickoff_utc || m.status === 'FT' || m.status === 'live' || ['1H','HT','2H','ET','PEN'].includes(m.status)) return false;
+    const ko = new Date(m.kickoff_utc);
+    return ko > now && ko <= in24;
+  }).sort((a,b) => new Date(a.kickoff_utc) - new Date(b.kickoff_utc));
+
   const el = document.getElementById('home-matches');
-  if(!active.length){ el.innerHTML = '<div class="card" style="text-align:center;color:var(--muted)">Keine Live-Spiele aktuell</div>'; }
-  else { el.innerHTML = active.map(m => renderMatchRow(m)).join(''); }
+  if(!active.length){
+    el.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);padding:20px;font-size:14px">Keine Live-Spiele oder heutigen Spiele</div>';
+  } else {
+    el.innerHTML = '<div class="card" style="padding:0 16px">' + active.map(m => renderMatchRow(m)).join('') + '</div>';
+  }
+
+  const upEl = document.getElementById('home-upcoming');
+  const upEmpty = document.getElementById('home-upcoming-empty');
+  if(!upcoming.length){
+    upEl.innerHTML = '';
+    upEmpty.style.display = 'block';
+  } else {
+    upEmpty.style.display = 'none';
+    upEl.innerHTML = '<div class="card" style="padding:0 16px">' + upcoming.map(m => renderMatchRow(m)).join('') + '</div>';
+  }
 }
 
 function switchSec(sec, btn){
@@ -436,7 +679,16 @@ function switchSec(sec, btn){
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById(`sec-${sec}`).classList.add('active');
   btn.classList.add('active');
+
+  const compSelector = document.getElementById('comp-selector');
+  if (sec === 'rangliste') {
+    compSelector.style.display = 'none';
+  } else {
+    compSelector.style.display = 'flex';
+  }
+
   if(sec==='rangliste') renderRanking();
+  if(sec==='home') renderHome();
 }
 
 function toast(m){
