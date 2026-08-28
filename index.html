@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Ultimate Football Tippspiel</title>
+<title>Tippspiel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -149,7 +149,7 @@ input,select,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 <div id="login-screen" style="display:none">
   <div class="login-wrap">
     <div style="font-size:52px">⚽</div>
-    <div style="font-size:26px;font-weight:800">Tippspiel 2024/25</div>
+    <div style="font-size:26px;font-weight:800">Tippspiel 2026/27</div>
     <div style="font-size:14px;color:var(--muted);text-align:center">Bundesliga · DFB-Pokal · Champions League</div>
     <div class="login-card">
       <div style="font-size:14px;font-weight:700">Dein Nickname</div>
@@ -178,7 +178,7 @@ input,select,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
 
     <!-- HOME SECTION -->
     <div class="section active" id="sec-home">
-      <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:10px">LIVE & HEUTE</div>
+      <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:10px">LIVE</div>
       <div id="home-matches"><div class="loader">Lade Spiele…</div></div>
 
       <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;margin:18px 0 10px">Nächste 24h</div>
@@ -289,29 +289,29 @@ let currentComp='bl1', activeMatchDay=1;
 
 const BONUS_CONFIGS = {
   bl1: [
-    { id: 'bl1_meister', label: '🏆 Deutscher Meister', placeholder: 'z.B. FC Bayern München' },
-    { id: 'bl1_vizemeister', label: '🥈 Vizemeister', placeholder: 'z.B. Bayer Leverkusen' },
-    { id: 'bl1_dritter', label: '🥉 3. Platz', placeholder: 'z.B. Borussia Dortmund' },
-    { id: 'bl1_absteiger18', label: '📉 Direktabsteiger (Platz 18)', placeholder: 'z.B. VfL Bochum' },
-    { id: 'bl1_absteiger17', label: '📉 Direktabsteiger (Platz 17)', placeholder: 'z.B. Holstein Kiel' },
-    { id: 'bl1_relegation16', label: '⚔️ Relegation (Platz 16)', placeholder: 'z.B. FC St. Pauli' },
-    { id: 'bl1_torschuetze', label: '👟 Torschützenkönig', placeholder: 'z.B. Harry Kane' },
-    { id: 'bl1_assists', label: '🎯 Meiste Assists', placeholder: 'z.B. Jamal Musiala' },
-    { id: 'bl1_keeper', label: '🧤 Bester Torwart', placeholder: 'z.B. Manuel Neuer' }
+    { id: 'bl1_meister', label: 'Deutscher Meister', placeholder: '' },
+    { id: 'bl1_vizemeister', label: 'Vizemeister', placeholder: '' },
+    { id: 'bl1_dritter', label: '3. Platz', placeholder: '' },
+    { id: 'bl1_absteiger18', label: 'Direktabsteiger (Platz 18)', placeholder: '' },
+    { id: 'bl1_absteiger17', label: 'Direktabsteiger (Platz 17)', placeholder: '' },
+    { id: 'bl1_relegation16', label: 'Relegation (Platz 16)', placeholder: '' },
+    { id: 'bl1_torschuetze', label: 'Torschützenkönig', placeholder: '' },
+    { id: 'bl1_assists', label: 'Meiste Assists', placeholder: '' },
+    { id: 'bl1_keeper', label: 'Bester Torwart', placeholder: '' }
   ],
   dfb: [
-    { id: 'dfb_sieger', label: '🏆 DFB-Pokalsieger', placeholder: 'z.B. Bayer Leverkusen' },
-    { id: 'dfb_finalist', label: '🥈 DFB-Pokal Finalist', placeholder: 'z.B. VfB Stuttgart' },
-    { id: 'dfb_ueberraschung', label: '💣 Außenseiter im Halbfinale', placeholder: 'z.B. 1. FC Saarbrücken' },
-    { id: 'dfb_torschuetze', label: '👟 Pokal-Torschützenkönig', placeholder: 'z.B. Deniz Undav' }
+    { id: 'dfb_sieger', label: 'DFB-Pokalsieger', placeholder: '' },
+    { id: 'dfb_finalist', label: 'DFB-Pokal Finalist', placeholder: '' },
+    { id: 'dfb_ueberraschung', label: 'Außenseiter im Halbfinale', placeholder: '' },
+    { id: 'dfb_torschuetze', label: 'Pokal-Torschützenkönig', placeholder: '' }
   ],
   cl: [
-    { id: 'cl_sieger', label: '🏆 Champions-League-Sieger', placeholder: 'z.B. Real Madrid' },
-    { id: 'cl_finalist', label: '🥈 CL-Finalist', placeholder: 'z.B. Manchester City' },
-    { id: 'cl_bestes_deutsches_team', label: '🇩🇪 Bestes deutsches Team', placeholder: 'z.B. FC Bayern München' },
-    { id: 'cl_torschuetze', label: '👟 CL-Torschützenkönig', placeholder: 'z.B. Kylian Mbappé' },
-    { id: 'cl_assists', label: '🎯 CL-Assistkönig', placeholder: 'z.B. Vinícius Júnior' },
-    { id: 'cl_mvp', label: '⭐ CL MVP (Bester Spieler)', placeholder: 'z.B. Jude Bellingham' }
+    { id: 'cl_sieger', label: 'Champions-League-Sieger', placeholder: '' },
+    { id: 'cl_finalist', label: 'CL-Finalist', placeholder: '' },
+    { id: 'cl_bestes_deutsches_team', label: 'Bestes deutsches Team', placeholder: '' },
+    { id: 'cl_torschuetze', label: 'CL-Torschützenkönig', placeholder: '' },
+    { id: 'cl_assists', label: 'CL-Assistkönig', placeholder: '' },
+    { id: 'cl_mvp', label: 'CL MVP (Bester Spieler)', placeholder: '' }
   ]
 };
 
@@ -436,7 +436,7 @@ function setCompetition(comp) {
   document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`btn-${comp}`).classList.add('active');
 
-  const titles = { bl1: 'Bundesliga Tippspiel', dfb: 'DFB-Pokal Tippspiel', cl: 'Champions League' };
+  const titles = { bl1: 'Bundesliga', dfb: 'DFB-Pokal', cl: 'Champions League' };
   document.getElementById('app-title').textContent = titles[comp];
 
   buildMatchdayTabs();
