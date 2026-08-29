@@ -367,7 +367,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   setInterval(async () => {
     if(!player) return;
-    await Promise.all([loadMatches(), loadMyTipps(), loadBonus()]);
+    await Promise.all([loadMatches(), loadMyTipps(), loadBonus(), renderRanking()]);
 
     const active = document.activeElement;
     const isTyping = active && (active.classList?.contains('score-in') || active.classList?.contains('input') || active.classList?.contains('select'));
