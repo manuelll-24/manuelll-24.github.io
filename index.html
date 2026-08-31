@@ -201,7 +201,7 @@ input,select,button{font-family:inherit;font-size:inherit}button{cursor:pointer}
     <div class="section" id="sec-tipps">
       <div class="gtabs" id="gtabs"></div>
       <div class="card" style="padding:0 16px">
-        <div id="group-matches"><div class="loader">Lade Spieltag…</div></div>
+        <div id="group-matches"><div class="loader">Lade Spiele…</div></div>
       </div>
     </div>
 
@@ -325,7 +325,7 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 let sb=null, player=null;
 let myTipps={}, dbMatches=[];
-let currentComp='bl1', activeMatchDay=1;
+let currentComp='bl1', activeStage='';
 
 const BONUS_CONFIGS = {
   bl1: [
@@ -508,19 +508,32 @@ async function loadBonus(){
 
 function buildMatchdayTabs(){
   const compMatches = dbMatches.filter(m => m.competition === currentComp);
-  const days = [...new Set(compMatches.map(m => m.match_day))].sort((a,b)=>a-b);
-  activeMatchDay = days[0] || 1;
+
+  // Sortiere nach match_day, erstelle Map aus stage und behalte die Reihenfolge bei
+  const stagesMap = new Map();
+  compMatches
+    .sort((a,b) => (a.match_day || 0) - (b.match_day || 0))
+    .forEach(m => {
+      const stageName = m.stage || (m.match_day ? `${m.match_day}. Spieltag` : 'Unbekannt');
+      if (!stagesMap.has(stageName)) {
+        stagesMap.set(stageName, stageName);
+      }
+    });
+
+  const stages = Array.from(stagesMap.keys());
+  activeStage = stages[0] || '';
 
   const container = document.getElementById('gtabs');
-  container.innerHTML = days.map(d =>
-    `<button class="gtab ${d===activeMatchDay?'active':''}" onclick="switchMatchday(${d})">Spieltag ${d}</button>`
+  container.innerHTML = stages.map(s =>
+    `<button class="gtab ${s===activeStage?'active':''}" onclick="switchMatchday('${s.replace(/'/g, "\\'")}')">${s}</button>`
   ).join('');
 }
 
-function switchMatchday(day){
-  activeMatchDay = day;
-  document.querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+function switchMatchday(stage){
+  activeStage = stage;
+  document.querySelectorAll('.gtab').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === stage);
+  });
   renderCurrentMatchday();
 }
 
@@ -590,7 +603,12 @@ function renderMatchRow(m){
 }
 
 function renderCurrentMatchday(){
-  const matches = dbMatches.filter(m => m.competition === currentComp && m.match_day === activeMatchDay);
+  const matches = dbMatches.filter(m => {
+    if (m.competition !== currentComp) return false;
+    const stageName = m.stage || (m.match_day ? `${m.match_day}. Spieltag` : 'Unbekannt');
+    return stageName === activeStage;
+  });
+
   const el = document.getElementById('group-matches');
   if(!matches.length){ el.innerHTML = '<div class="loader">Keine Spiele gefunden</div>'; return; }
   el.innerHTML = matches.map(m => renderMatchRow(m)).join('');
@@ -670,7 +688,7 @@ function calcPts(tip, res){
   if(tip.h === '' || tip.h === null || tip.h === undefined || tip.a === '' || tip.a === null || tip.a === undefined) return null;
   if(tip.h === res.h && tip.a === res.a) return 4;
   if((tip.h - tip.a) === (res.h - res.a)) return 3;
-  if((tip.h > tip.a && res.h > res.a) || (tip.h < tip.a && res.h < res.a) || (tip.h === tip.a && res.h === res.a)) return 2;
+  if((tip.h > tip.a && res.h > res.a) || (tip.h < tip.a && res.h < res.a) || (tip.h === tip.a && res.a === res.a)) return 2;
   return 0;
 }
 
