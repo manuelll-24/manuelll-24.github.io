@@ -576,9 +576,9 @@ function renderMatchRow(m){
       </div>`;
   } else {
     scoreHtml = `<div class="score-box">
-        <input class="score-in" type="number" min="0" value="${valH}" id="m_${m.match_id}_h" oninput="saveTipp(${m.match_id})" placeholder="-">
+        <input class="score-in" type="number" min="0" value="${valH}" oninput="saveTipp(this, ${m.match_id})" placeholder="-">
         <span>:</span>
-        <input class="score-in" type="number" min="0" value="${valA}" id="m_${m.match_id}_a" oninput="saveTipp(${m.match_id})" placeholder="-">
+        <input class="score-in" type="number" min="0" value="${valA}" oninput="saveTipp(this, ${m.match_id})" placeholder="-">
       </div>`;
   }
 
@@ -614,13 +614,15 @@ function renderCurrentMatchday(){
   el.innerHTML = matches.map(m => renderMatchRow(m)).join('');
 }
 
-function saveTipp(mid){
-  const hElem = document.getElementById(`m_${mid}_h`);
-  const aElem = document.getElementById(`m_${mid}_a`);
-  if (!hElem || !aElem) return;
+function saveTipp(elem, mid){
+  const box = elem.closest('.score-box');
+  if (!box) return;
 
-  const hVal = hElem.value.trim();
-  const aVal = aElem.value.trim();
+  const inputs = box.querySelectorAll('.score-in');
+  if (inputs.length < 2) return;
+
+  const hVal = inputs[0].value.trim();
+  const aVal = inputs[1].value.trim();
 
   const h = hVal !== '' ? parseInt(hVal, 10) : null;
   const a = aVal !== '' ? parseInt(aVal, 10) : null;
